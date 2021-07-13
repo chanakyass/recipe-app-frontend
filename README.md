@@ -8,6 +8,8 @@ to run the application
 
 Application runs on port 3000
 
+The backend for this application (https://github.com/chanakyass/recipes-app-backend) runs on port 8080. The backend needs to be running for this application to work
+
 You can use these dummy credentials to play with the application.
 
 username (email) : dummy@rest.com
