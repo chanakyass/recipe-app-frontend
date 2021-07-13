@@ -6,6 +6,8 @@ Clone the repository https://github.com/chanakyass/recipe-app-frontend.git. Proc
 + followed by npm start
 to run the application
 
+Application runs on port 3000
+
 You can use these dummy credentials to play with the application.
 
 username (email) : dummy@rest.com
