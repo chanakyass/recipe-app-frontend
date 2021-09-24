@@ -116,6 +116,7 @@ const AddModifyRecipe = () => {
 
   const fetchIngredientsEventHandler =  (e) => {
     const ingredientName = e.target.value;
+
     if (ingredientName) {
       fetchIngredientsStartingWith(ingredientName).then(({ response, error }) => {
         if (!error) {
@@ -135,7 +136,7 @@ const AddModifyRecipe = () => {
 
   const changeRecipeIngredient = (targetName, targetValue, uuid) => {
     const name = targetName.split("_")[2].trim();
-    const value = targetValue.trim();
+    const value = targetValue;
 
     if (equalsIgnoringCase(name, "name")) {
       let ingredient1 = ingredientListFetched.ingredientsList.find((ingredient) => equalsIgnoringCase(ingredient.name, value));

@@ -14,6 +14,7 @@ const CompleteRecipeCardModal = ({ modalProps, setModalProps, setRecipies }) => 
     const servingPng = process.env.PUBLIC_URL + "/SERVES.png";
 
     const currentUser = cookie.load('current_user');
+    console.log(currentUser)
 
     const deleteHandler = (e, recipeId) => {
         e.preventDefault();

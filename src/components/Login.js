@@ -3,6 +3,7 @@ import { loginUser } from "./services/user-service";
 import { Col, Form, Button } from 'react-bootstrap';
 import { useState } from "react";
 import { withRouter } from "react-router-dom";
+//import { baseURI } from "../util/api-config";
 
 const Login = () => {
 
@@ -81,6 +82,31 @@ const Login = () => {
                   <Button className="my-3" type="submit">
                     Submit
                   </Button>
+                </Form.Group>
+
+                <Form.Group as={Col} md={12}>
+                  {/* <Button className="my-3" onClick={googleHandler}>
+                    Google
+                  </Button> */}
+                  <div>
+                    {/* <a href="http://localhost:8080/oauth2/authorize/google" >
+                      Google
+                    </a> */}
+                    <a href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:3000/oauth2/redirect">
+                      Google
+                    </a>
+                  </div>
+                </Form.Group>
+
+                <Form.Group as={Col} md={12}>
+                  {/* <Button className="my-3" onClick={googleHandler}>
+                    Google
+                  </Button> */}
+                  <div>
+                    <a href="http://localhost:8080/oauth2/authorize/github?redirect_uri=http://localhost:3000/oauth2/redirect">
+                      Github
+                    </a>
+                  </div>
                 </Form.Group>
 
                 <Form.Group as={Col} md={12}>

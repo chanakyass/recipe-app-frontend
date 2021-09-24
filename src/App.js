@@ -10,6 +10,7 @@ import ErrorPage from './components/ErrorPage';
 import { Router, Redirect, Route, Switch } from "react-router";
 import AppEntry from './components/AppEntry';
 import history from './app-history';
+import OAuth2RedirectHandler from "./components/OAuth2RedirectHandler";
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
           <Route exact path="/" render={() => userExists() ? <RecipesPanel /> : <Redirect to={{ pathname: "/login" }} />} /> */}
           <Route exact path="/login" component={Login}></Route>
           <Route exact path="/register" component={Register}></Route>
+        <Route path="/oauth2/redirect" component={OAuth2RedirectHandler}></Route>  
           <Route exact path="/auth_error" component={ErrorPage} />
           <Route exact path="/conn_error" component={ ErrorPage} />
           <Route exact path="*" render={() => userExists() ? <CurrentUserContext.Provider value={value}><AppEntry /></CurrentUserContext.Provider> : <Redirect to="/login" />}></Route>

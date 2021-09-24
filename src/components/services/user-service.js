@@ -140,6 +140,31 @@ export const getUser = async (id) => {
   }
 }
 
+export const getUserInSession = async () => {
+  const jwtToken = cookie.load("jwt");
+
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${jwtToken}`,
+      "Content-Type": "application/json",
+    },
+  };
+
+  try {
+    const response = await fetch(`${baseURI}/user/me`, requestOptions);
+    if (response.status === 200) {
+      const user = await response.json();
+      return { response: user, error: null };
+    } else {
+      const apiCallError = await response.json();
+      return { response: null, error: apiCallError };
+    }
+  } catch (error) {
+    return { response: null, error: error };
+  }
+};
+
 export const updateUser = async (user) => {
   const jwtToken = cookie.load('jwt');
   const loggedInUser = cookie.load("current_user");
