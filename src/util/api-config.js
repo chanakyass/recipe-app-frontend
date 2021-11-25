@@ -1,1 +1,1 @@
-export const baseURI = `http://localhost:8080/api/v1`;
+export const baseURI = `https://www.mykitchenrecipes.ml/api/v1`;

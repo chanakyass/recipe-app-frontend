@@ -42,7 +42,7 @@ const RecipesPanel = () => {
         <div className="container">
             <div className="row p-3">
                     {
-                    recipes.map((recipe, index) => {
+                    (recipes.length > 0) ? recipes.map((recipe, index) => {
                         if (index === 0) {
                             return <>
                             <div className="col-md-3 col-lg-3 col-sm-3 m-4 rounded shadow grow" style={{ cursor: "pointer" }} onClick={() => history.push({
@@ -65,6 +65,19 @@ const RecipesPanel = () => {
                         }
 
                         })
+                        :
+                        <div className="col-md-3 col-lg-3 col-sm-3 m-4 rounded shadow grow" style={{ cursor: "pointer" }} onClick={() => history.push({
+                            pathname: `/recipe/new`,
+                            state: {mode: "ADD", recipeToModify: null}
+
+                                })}>
+
+                                <div className="row h-100">
+                                <div className="my-auto mx-auto">Click here to add a new Recipe</div>
+                                </div>
+                  
+
+                        </div>
                     }
             </div>
         </div>

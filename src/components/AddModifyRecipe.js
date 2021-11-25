@@ -211,7 +211,7 @@ const AddModifyRecipe = () => {
     return (
       <div style={{ height: "80vh", maxHeight: "80vh" }}>
         <div className="row h-100 m-4">
-          <div className="col-md-5 col-lg-5 col-sm-5 mx-auto my-auto rounded shadow bg-white ">
+          <div className="col-md-7 col-lg-7 col-sm-7 mx-auto my-auto rounded shadow bg-white ">
             <div className="col-md-12 col-sm-12 col-lg-12 mx-auto mt-3">
               <h3>{mode === "MODIFY" ? "Modify Recipe" : "Add Recipe"}</h3>
             </div>
@@ -278,7 +278,7 @@ const AddModifyRecipe = () => {
                       return (
                         <ListGroupItem
                           key={recipeIngredient.uuid}
-                          className="border-0"
+                          className="border-0 px-5"
                         >
                           <InputGroup>
                             <FormControl
