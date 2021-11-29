@@ -1,4 +1,2 @@
-export const baseURI = `https://www.mykitchenrecipes.ml/api/v1`;
-export const netlifyProcessEnvURL = function() {
-    return process.env.URL;
-};
+export const baseURI = `${process.env.REACT_APP_HOST_URI}/api/v1`;
+export const netlifyProcessEnvURL = process.env.URL;

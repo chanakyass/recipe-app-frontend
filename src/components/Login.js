@@ -87,7 +87,7 @@ const Login = () => {
 
                 <Form.Group as={Col} md={12}>
                   <div>
-                    <a href={baseURI+`/oauth2/authorize/google?redirect_uri=${netlifyProcessEnvURL()}/oauth2/redirect`}>
+                    <a href={baseURI+`/oauth2/authorize/google?redirect_uri=${netlifyProcessEnvURL}/oauth2/redirect`}>
                       Google
                     </a>
                   </div>
@@ -95,7 +95,7 @@ const Login = () => {
 
                 <Form.Group as={Col} md={12}>
                   <div>
-                    <a href={baseURI+`/oauth2/authorize/github?redirect_uri=${netlifyProcessEnvURL()}/oauth2/redirect`}>
+                    <a href={baseURI+`/oauth2/authorize/github?redirect_uri=${netlifyProcessEnvURL}/oauth2/redirect`}>
                       Github
                     </a>
                   </div>
