@@ -1,9 +1,9 @@
 import history from "../app-history";
-//import { baseURI } from "../util/api-config";
 import { getQueryStringParams } from "../util/utility-functions";
 import { useEffect } from "react";
 import { getUserInSession } from "./services/user-service";
 import cookie from "react-cookies";
+import { handleError } from "../util/error-handling";
 
 const OAuth2RedirectHandler = () => {
 
@@ -18,20 +18,20 @@ const OAuth2RedirectHandler = () => {
       let expires = new Date();
       expires.setDate(expires.getDate() + 7);
       cookie.save("jwt", token, { path: "/", expires: expires });
-      getUserInSession().then(({ response, error }) => {
-        if (error) {
-          console.log(error);
+      getUserInSession().then(({ response, errorInService }) => {
+        if (errorInService) {
+          handleError({"error": errorInService})
         } else {
           const currentUser = response;
           cookie.save("current_user", currentUser, {
             path: "/",
             expires: expires,
           });
-          history.push("/")
+          history.push("/");
         }
       });
     } else {
-      console.log(error);
+      handleError({"error": error});
     }
   }
 
