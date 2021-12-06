@@ -3,8 +3,6 @@ import cookie from "react-cookies";
 import moment from "moment";
 
 export const handleError = ({ error }) => {
-  console.log(error);
-
   if (
     !error.statusCode &&
     error.toString().match(/TypeError: Failed to fetch/gi)

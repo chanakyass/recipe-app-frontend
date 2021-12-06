@@ -9,10 +9,6 @@ const ErrorPage = ({ location }) => {
   };
 
   const error = location.state || defaultError;
-  console.log(error);
-  console.log(error.statusCode);
-  console.log(error.details);
-  console.log(error.message);
   return (
     <>
       <div className="mw-100">
