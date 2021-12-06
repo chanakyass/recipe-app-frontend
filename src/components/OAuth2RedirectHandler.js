@@ -13,6 +13,7 @@ const OAuth2RedirectHandler = () => {
   const getTokenAndLoadUser = (params) => {
     const token = params.token;
     const error = params.error;
+    let error2;
 
     if (token) {
       let expires = new Date();
@@ -20,8 +21,19 @@ const OAuth2RedirectHandler = () => {
       cookie.save("jwt", token, { path: "/", expires: expires });
       getUserInSession().then(({ response, errorInService }) => {
         if (errorInService) {
-          errorInService.statusCode = 401;
-          handleError({"error": errorInService})
+          if(errorInService instanceof "string") {
+            error2 = {
+              statusCode: 401,
+              message: errorInService
+            };
+          }
+          else {
+            error2 = {
+              ...errorInService,
+              statusCode: 401
+            };
+          }
+          handleError({"error": error2})
         } else {
           const currentUser = response;
           cookie.save("current_user", currentUser, {
@@ -32,8 +44,11 @@ const OAuth2RedirectHandler = () => {
         }
       });
     } else {
-      error.statusCode = 401;
-      handleError({"error": error});
+      error2 = {
+          statusCode: 401, 
+          message: error
+      };
+      handleError({"error": error2});
     }
   }
 
