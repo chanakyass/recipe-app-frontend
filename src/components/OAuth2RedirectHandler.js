@@ -20,6 +20,7 @@ const OAuth2RedirectHandler = () => {
       cookie.save("jwt", token, { path: "/", expires: expires });
       getUserInSession().then(({ response, errorInService }) => {
         if (errorInService) {
+          errorInService.statusCode = 401;
           handleError({"error": errorInService})
         } else {
           const currentUser = response;
@@ -31,6 +32,7 @@ const OAuth2RedirectHandler = () => {
         }
       });
     } else {
+      error.statusCode = 401;
       handleError({"error": error});
     }
   }

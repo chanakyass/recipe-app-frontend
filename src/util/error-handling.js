@@ -19,9 +19,6 @@ export const handleError = ({ error }) => {
     cookie.remove("current_user", { path: "/" });
     history.push("/auth_error", error);
   }
-//   else if (
-//     error.statusCode === 500 ) {
-//   }
   else {
     history.push("/error", error);
   }
