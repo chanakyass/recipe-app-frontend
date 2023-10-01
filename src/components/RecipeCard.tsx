@@ -4,11 +4,15 @@ import {
     ListGroupItem
 }
  from "react-bootstrap";
+import { Recipe, useRecipeSelector } from "../store/store.model";
 
-const RecipeCard = ({ recipe, setRecipies, hideAdditionalDetails, viewRecipe }) => {
+const RecipeCard = ({ recipeId, viewRecipe }: { recipeId: number, viewRecipe: (recipe: Recipe) => void }) => {
     const vegPng = process.env.PUBLIC_URL + "/veg.png";
     const nonVegPng = process.env.PUBLIC_URL + "/non-veg.png";
     const servingPng = process.env.PUBLIC_URL + "/SERVES.png";
+
+    const recipe = useRecipeSelector((state) => state.recipes.resourceMap[recipeId]);
+
     return <>
         <div className="col-md-3 col-lg-3 col-sm-3 m-4 rounded shadow grow" style={{ cursor: "pointer" }} onClick={ () => viewRecipe(recipe) }>
             <Card className="border-0">
@@ -31,11 +35,11 @@ const RecipeCard = ({ recipe, setRecipies, hideAdditionalDetails, viewRecipe }) 
                             </div>
                         </div>
                 </Card.Body>
-                <div hidden={ hideAdditionalDetails }>
+                <div hidden={true}>
                     <ListGroup className="list-group-flush">
                         {
-                            recipe.recipeIngredients.map((recipeIngredient, index) => {
-                                return (<ListGroupItem>
+                            recipe.recipeIngredients.map((recipeIngredient) => {
+                                return (<ListGroupItem key={recipeIngredient.uuid}>
                                     {
                                         recipeIngredient.quantity + " " + recipeIngredient.uom + " " + recipeIngredient.ingredient.name
                                     }

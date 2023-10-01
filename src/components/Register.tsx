@@ -1,50 +1,68 @@
-import React, { useState } from "react";
-import history from "../app-history";
-import { Col, Form, Button } from "react-bootstrap";
-import { isValid, loginUser, registerUser } from "./services/user-service";
+import { useEffect, useState } from "react";
+import { Button, Col, Form } from "react-bootstrap";
 import { withRouter } from "react-router-dom";
+import history from "../app-history";
+import { ThunkResponse, useAppDispatch, useErrorSelector } from "../store/store.model";
+import { loginUser, registerUser } from "../store/userSlice";
+import { isValid } from "./services/user-service";
+
+const defaultUser = {
+  id: undefined,
+  firstName: "",
+  middleName: "",
+  lastName: "",
+  email: "",
+  profileName: "",
+  password: "",
+  dob: "",
+  userSummary: ""
+};
+
+const defaultValidations = {
+hasError: false,
+fieldErrors: {
+  idError: "",
+  firstNameError: "",
+  lastNameError: "",
+  profileNameError: "",
+  emailError: "",
+  passwordError: "",
+  DOBError: "",
+  userSummaryError: "",
+},
+backendError: {
+  statusCode: 0,
+  message: "",
+  timestamp: "",
+  details: [] as string[],
+},
+};
 
 const Register = () => {
-  const defaultUser = {
-    id: null,
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    email: "",
-    profileName: "",
-    password: "",
-    dob: "",
-    userSummary: ""
-  };
-  
-const defaultValidations = {
-  hasError: false,
-  fieldErrors: {
-    idError: "",
-    firstNameError: "",
-    lastNameError: "",
-    profileNameError: "",
-    emailError: "",
-    passwordError: "",
-    DOBError: "",
-    userSummaryError: "",
-  },
-  backendError: {
-    statusCode: null,
-    message: "",
-    timestamp: "",
-    details: [],
-  },
-};
 
 const [user, setUser] = useState(defaultUser);
 
 const [validations, setValidations] = useState(defaultValidations);
-    
 
-  const changePerson = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
+const dispatch = useAppDispatch();
+
+const errorInRegistration = useErrorSelector((state) => (
+  state.notifications.errors.find((error) => error.resourceType === 'user' && error.action === 'REGISTER')
+));
+
+useEffect(() => {
+  if (errorInRegistration?.errorType === 'VALIDATION') {
+    setValidations((validations) => ({
+      ...validations,
+      hasError: true,
+      backendError: errorInRegistration.error!
+    }));
+  }
+}, [setValidations, errorInRegistration]);
+    
+  const changePerson = (e: any) => {
+    const name = e.target?.name;
+    const value = e.target?.value;
     const newUser = {
       ...user,
       [name]: value,
@@ -52,28 +70,27 @@ const [validations, setValidations] = useState(defaultValidations);
     setUser(newUser);
   };
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e: any) => {
       e.preventDefault();
       const fieldErrors = { ...defaultValidations.fieldErrors };
       if (isValid(user, fieldErrors, "POST")) {
-          registerUser(user).then(({ response, error }) => {
-              if (!error) {
-                  loginUser({ username: user.email, password: user.password }).then(({ response, error }) => {
-                      if (!error) {
-                          history.push("/");
-                      }
-                      else {
-                          history.push("/login");
-                      }
-                  });
+        try {
+          const thunkResponse = await dispatch(registerUser(user)).unwrap();
+          if (thunkResponse === ThunkResponse.SUCCESS) {
+            dispatch(loginUser({ username: user.email, password: user.password })).then((response) => {
+              const thunkResponse = response.payload as ThunkResponse;
+              if (thunkResponse === ThunkResponse.SUCCESS) {
+                history.push('/');
+              } else {
+                history.push('/login');
               }
-              else {
-                  setValidations({ ...validations, hasError: true, backendError: { ...error } });
-              }
-          })
-      }
-      else {
-          setValidations({ hasError: true, fieldErrors: { ...fieldErrors }, backendError: {...defaultValidations.backendError} });
+            });
+          }
+        } catch(error) {
+          console.log(error);
+        }
+      } else {
+        setValidations({ ...defaultValidations, fieldErrors: fieldErrors, hasError: true });
       }
   };
 

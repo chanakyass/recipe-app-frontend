@@ -1,5 +1,5 @@
 import { withRouter } from "react-router-dom";
-const ErrorPage = ({ location }) => {
+const ErrorPage = ({ location }: any) => {
   const defaultError = {
     error: {
       statusCode: 500,
@@ -25,7 +25,7 @@ const ErrorPage = ({ location }) => {
         {error.details && (
           <div className="m-4 row">
             <ul>
-              {error.details.map((detail, index) => {
+              {error.details.map((detail: any, index: number) => {
                 return <li key={index}>{detail}</li>;
               })}
             </ul>

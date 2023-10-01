@@ -1,31 +1,27 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
+import {
   useCallback,
+  useEffect,
+  useState,
 } from "react";
-import cookie from "react-cookies";
-import { isValid } from "./services/user-service";
-import { Form, Col, Button, InputGroup } from "react-bootstrap";
+import { Button, Col, Form, InputGroup } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import history from "../app-history";
-import { CurrentUserContext } from "../App"
-import { getUser, updateUser } from "./services/user-service";
-import { handleError } from "../util/error-handling";
+import { APICallError, ThunkResponse, User, useAppDispatch, useErrorSelector, useUserSelector } from "../store/store.model";
+import { getUser, modifyUser as modifyUserService } from "../store/userSlice";
+import { isValid } from "./services/user-service";
+import withLoading from "./LoadingPage";
 
-const UserViewModify = () => {
-  const defaultUser = {
-    id: null,
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    profileName: "",
-    dob: "",
-    userSummary: "",
-    };
-    
+const defaultUser = {
+  firstName: "",
+  middleName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  profileName: "",
+  dob: "",
+  userSummary: "",
+} as User;
+  
 const defaultValidations = {
   hasError: false,
   fieldErrors: {
@@ -37,51 +33,57 @@ const defaultValidations = {
     userSummaryError: "",
   },
   backendError: {
-    statusCode: null,
+    statusCode: 0,
     message: "",
     timestamp: "",
-    details: [],
-  },
+    details: [] as string[],
+    URI: ''
+  } as APICallError,
 };
 
+const UserViewModify = () => {
 
-  const { setIsCurrentUserUpdated } = useContext(CurrentUserContext);
+  const dispatch = useAppDispatch();
 
-    const loggedInUser = cookie.load("current_user");
-    
-    const [modifyUser, setModifyUser] = useState(false);
+  const loggedInUser = useUserSelector((state) => state.users.loggedInUser);
 
-    const [user, setUser] = useState(defaultUser);
-    
-    const [validations, setValidations] = useState(defaultValidations);
+  const errorInModify = useErrorSelector((state) => state.notifications.errors
+    .find((error) => error.resourceType === 'user' && error.action === 'MODIFY' && error.errorType === 'VALIDATION'));
+
+  const [modifyUser, setModifyUser] = useState(false);
+
+  const [user, setUser] = useState(defaultUser);
+  
+  const [validations, setValidations] = useState(defaultValidations);
 
   const [isLoggedInUser, setIsLoggedInUser] = useState(false);
 
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
 
   const loadUser = useCallback(() => {
-    
-      getUser(id).then(({ response, error }) => {
-          if (!error) {
-              const user = response;
-              setUser(user);
-              if (loggedInUser.id === parseInt(id)) {
-                setIsLoggedInUser(true);
-              }
-          }
-          else {
-              handleError({ error: error });
-          }
-      })
-
-    
-  }, [id, loggedInUser.id]);
+    dispatch(getUser({id: parseInt(id), isLoggedInUser: false })).unwrap().then((user) => {
+      if (user && user?.id === loggedInUser.id) {
+        setIsLoggedInUser(true);
+        setUser(user)
+      }
+    });
+  }, [loggedInUser.id, id, dispatch]);
 
   useEffect(() => {
     loadUser();
   }, [loadUser]);
 
-  const changePerson = (e) => {
+  useEffect(() => {
+    if (errorInModify && errorInModify.error) {
+      setValidations({
+        ...defaultValidations,
+        hasError: true,
+        backendError: errorInModify.error,
+      });
+    }
+  }, [errorInModify])
+
+  const changePerson = (e: any) => {
     const name = e.target.name;
     const value = e.target.value;
     const newUser = {
@@ -91,78 +93,33 @@ const defaultValidations = {
     setUser(newUser);
   };
 
-
-
-  const updateHandler = (e) => {
+  const updateHandler = (e: any) => {
     e.preventDefault();
 
     const fieldErrors = {
+      idError: "",
       nameError: "",
       profileNameError: "",
-      passwordError: "",
+      emailError: "",
       DOBError: "",
       userSummaryError: "",
     };
 
-      if (isValid(user, fieldErrors, "PUT")) {
-
-          updateUser(user).then(({ response, error }) => {
-              if (!error) {
-                  setIsCurrentUserUpdated(true);
-                  history.push("/");
-              }
-              else {
-                  setValidations({
-                      hasError: true,
-                      backendError: {
-                          ...validations.backendError, ...error
-                      },
-                      fieldErrors: {
-                          ...defaultValidations.fieldErrors
-                      }
-                  })
-              }
-          })
-      }
-      else {
-          setValidations({
-              hasError: true,
-              backendError: {
-                  ...defaultValidations.backendError,
-                  fieldErrors: {...fieldErrors}
-              }
-          })
-      }
+    if (isValid(user, fieldErrors, "PUT")) {
+      dispatch(modifyUserService(user)).unwrap().then((thunkResponse) => {
+        if (thunkResponse === ThunkResponse.SUCCESS) {
+          history.push('/');
+        }
+      });
+    }
+    else {
+      setValidations({
+        ...defaultValidations,
+        hasError: true,
+        fieldErrors,
+      });
+    }
   };
-
-//   const deleteHandler = (e) => {
-//     e.preventDefault();
-//     const requestOptions = {
-//       method: RestMethod.DELETE,
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${jwtToken}`,
-//       },
-//     };
-
-//     fetch(`${baseURI}/profile/${id}`, requestOptions).then((response) => {
-//       response.json().then((body) => {
-//         if (response.status === 200) {
-//           cookie.remove("jwt", { path: "/" });
-//           cookie.remove("current_user", { path: "/" });
-//           setTimeout(() => history.push("/login"), 800);
-//         } else {
-//           const { error } = body;
-//           dispatch({
-//             type: RestMethod.DELETE,
-//             preprocessed: true,
-//             status: response.status,
-//             payload: error,
-//           });
-//         }
-//       });
-//     });
-//   };
 
   return (
     <>
@@ -394,4 +351,4 @@ const defaultValidations = {
   );
 };
 
-export default UserViewModify;
+export default withLoading(UserViewModify);

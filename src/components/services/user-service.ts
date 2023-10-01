@@ -1,7 +1,8 @@
 import { baseURI } from "../../util/api-config";
-import cookie from 'react-cookies';
+import * as cookie from 'react-cookies';
+import { ApiMessageResponse, AuthRequest, ResponseObject, User, UserProxy } from "./service.model";
 
-export const loginUser = async (creds) => {
+export const loginUser = async (creds: AuthRequest): Promise<ResponseObject<UserProxy>> => {
 
     const requestOptions = {
         method: "POST",
@@ -13,7 +14,7 @@ export const loginUser = async (creds) => {
     const response = await fetch(`${baseURI}/public/login`, requestOptions);
     if (response.status === 200) {
       const currentUser = await response.json();
-      const jwt = response.headers.get("Authorization");
+      const jwt = response.headers.get("Authorization") as string;
 
       let expires = new Date();
       expires.setDate(expires.getDate() + 7);
@@ -35,7 +36,7 @@ export const loginUser = async (creds) => {
 
 }
 
-export const registerUser = async (user) => {
+export const registerUser = async (user: User): Promise<ResponseObject<User>> => {
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,7 +59,7 @@ export const registerUser = async (user) => {
   }
 }
 
-export const isValid = (user, fieldErrors, method) => {
+export const isValid = (user: User, fieldErrors: { [key: string]: string }, method: string): boolean => {
   let returnValue = true;
 
   if (user.firstName === "") {
@@ -113,7 +114,7 @@ export const isValid = (user, fieldErrors, method) => {
   return returnValue;
 };
 
-export const getUser = async (id) => {
+export const getUser = async (id: number): Promise<ResponseObject<User>> => {
 
   const jwtToken = cookie.load("jwt");
   
@@ -140,7 +141,7 @@ export const getUser = async (id) => {
   }
 }
 
-export const updateUser = async (user) => {
+export const updateUser = async (user: User): Promise<ResponseObject<ApiMessageResponse>> => {
   const jwtToken = cookie.load('jwt');
   const loggedInUser = cookie.load("current_user");
 

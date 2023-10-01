@@ -1,24 +1,19 @@
 import {
-  Navbar,
-  Nav,
-  DropdownButton,
   Dropdown,
+  DropdownButton,
+  Nav,
+  Navbar,
 } from "react-bootstrap";
 
-import cookie from "react-cookies";
-import React, { useContext } from "react";
-import { CurrentUserContext } from "../App";
+import * as React from "react";
+import * as cookie from "react-cookies";
 import history from "../app-history";
+import { useUserSelector } from "../store/store.model";
 
 const NavBar = React.memo(() => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const { setIsCurrentUserUpdated } = useContext(CurrentUserContext);
+  const loggedInUser = useUserSelector((state) => state.users.loggedInUser);
 
-  setIsCurrentUserUpdated(false);
-
-  const loggedInUser = cookie.load("current_user");
-
-  const logout = (e) => {
+  const logout = (_e: Event) => {
     cookie.remove("jwt", { path: "/" });
     cookie.remove("current_user", { path: "/" });
     setTimeout(() => history.push("/login"), 200);
@@ -26,7 +21,7 @@ const NavBar = React.memo(() => {
 
   return (
     <>
-      {
+      {loggedInUser.id &&
         <Navbar sticky="top" bg="primary" fixed="top" expand="lg">
           <Navbar.Brand href="/">Recipes app</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -46,7 +41,7 @@ const NavBar = React.memo(() => {
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item href="#">Give feedback</Dropdown.Item>
-                <Dropdown.Item href="#" onClick={(e) => logout(e)}>
+                <Dropdown.Item href="#" onClick={(e: Event) => logout(e)}>
                   Logout
                 </Dropdown.Item>
               </DropdownButton>

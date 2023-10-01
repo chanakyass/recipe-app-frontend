@@ -1,85 +1,80 @@
-import { useEffect, useState } from "react";
-import { fetchIngredientsStartingWith, addOrModifyRecipe, getRecipe } from "./services/recipe-services";
-import { equalsIgnoringCase, debounced, convertStringToCapitalCamelCase } from "../util/utility-functions";
-import { v4 as uuidv4 } from 'uuid';
-import { Form, Col, ListGroup, ListGroupItem, Button, FormControl, InputGroup } from 'react-bootstrap';
+import { useCallback, useEffect, useState } from "react";
+import { Button, Col, Form, FormControl, InputGroup, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import history from "../app-history";
-import { handleError } from "../util/error-handling";
 import { storage } from "../firebase";
-import cookie from 'react-cookies';
+import { addRecipe, fetchIngredientsStartingWithName, modifyRecipe } from "../store/recipeSlice";
+import { APICallError, Ingredient, Recipe, RecipeIngredient, ThunkResponse, UserProxy, useAppDispatch, useRecipeSelector, useUserSelector } from "../store/store.model";
+import navigateToErrorPage from "../util/error-handling";
+import { convertStringToCapitalCamelCase, debounced, equalsIgnoringCase } from "../util/utility-functions";
 
-const AddModifyRecipe = () => {  
-  const [recipe, setRecipe] = useState({
-        id: null,
-        name: "",
-        description: "",
-        createdOn: "",
-        itemType: "",
-        serving: null,
-        recipeIngredients: [],
-        user: {
-            id: null
-        },
-        cookingInstructions: ""
-    });
-  
-  //const history = useHistory();
+const AddModifyRecipe = () => {
 
-  let mode = null;
+  const dispatch = useAppDispatch();
 
-  const [image, setImage] = useState(null);
+  const [recipe, setRecipe] = useState<Recipe>({
+    name: '',
+    description: '',
+    createdOn: '',
+    itemType: '',
+    serving: '',
+    recipeImageAddress: '',
+    cookingInstructions: '',
+    recipeIngredients: [] as RecipeIngredient[],
+    user: {} as UserProxy
+  } as Recipe);
+
+  const [image, setImage] = useState({} as { [key: string]: any });
   const [progress, setProgress] = useState("");
+  const [ingredientListFetched, setIngredientListFetched] = useState({ingredientsList: [] as Ingredient[]});
 
 
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
 
+  const [mode, setMode] = useState('');
+
+  useEffect(() => {
     if (id !== "new") {
-      mode = "MODIFY";
-  }
-    else {
-      mode = "ADD";
-  }
+      setMode('MODIFY');
+    } else {
+      setMode('ADD');
+    }
+  }, [id])
 
-  const loggedInUser = cookie.load('current_user');
+  const recipeToModify = useRecipeSelector((state) => {
+    if (id !== 'new') {
+      const recipe = state.recipes.resourceMap[parseInt(id)];
+      return recipe;
+    }
+    return undefined;
+  }) as Recipe;
 
-  const loadRecipe = (id) => {
-        getRecipe(id).then(({ response, error }) => {
-          if (!error) {
-            const recipeToModify = response;
-            const recipeIngredients = recipeToModify.recipeIngredients.map(
-              (recipeIngredient) => {
-                return { ...recipeIngredient, uuid: uuidv4() };
-              }
-            );
-            setRecipe({
-              ...recipeToModify,
-              recipeIngredients: [...recipeIngredients],
-            });
-          } else handleError({error: error})
-        });
-  }
+  useEffect(() => {
+    if (recipeToModify) {
+      setRecipe(recipeToModify);
+    }
+  }, [recipeToModify, setRecipe]);
 
-  const handleChange = (e) => {
+  const loggedInUser = useUserSelector((state) => state.users.loggedInUser);
+
+  const handleChange = (e: any) => {
     e.preventDefault();
-      if (e.target.files[0]) {
+      if (e.target?.files[0]) {
         setImage(e.target.files[0]);
       }
   };
   
-  const handleUpload = (e) => {
+  const handleUpload = useCallback((e: any) => {
     e.preventDefault();
-    const uploadTask = storage.ref(`images/${loggedInUser.id}/${image.name}`).put(image);
+    const uploadTask = storage.ref(`images/${loggedInUser.id}/${image.name}`).put(image as Blob);
     uploadTask.on(
       "state_changed",
-      (snapshot) => {
-        // const progress = Math.round(
-        //   (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        // );
+      (_) => {
           setProgress("wait");
       },
       (error) => {
-        handleError({error: error})
+        navigateToErrorPage({error: error as unknown as APICallError});
       },
       () => {
         setProgress("done");
@@ -92,48 +87,31 @@ const AddModifyRecipe = () => {
           });
       }
     );
-  };
+  }, [setProgress, setRecipe, image, loggedInUser.id, recipe]);
   
+  const uomList = ["Select", "MILLIGRAMS", "GRAMS", "KILOGRAMS", "MILLILITRES", "LITRES", "TEA_SPOON", "TABLE_SPOON", "NUMBER"];
 
-
-
-      
-  useEffect(() => {
-    if (mode === "MODIFY") {
-      loadRecipe(id);
-    }
-  }, [mode, id]);
-  
-  const [ingredientListFetched, setIngredientListFetched] = useState({ingredientsList: []});
-  
-  const uomList = ["MILLIGRAMS", "GRAMS", "KILOGRAMS", "MILLILITRES", "LITRES", "TEA_SPOON", "TABLE_SPOON", "NUMBER"];
-
-  const changeDefaults = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
+  const changeDefaults = useCallback((e: any) => {
+    const name: string = e.target?.name;
+    const value: string = e.target?.value;
     setRecipe({ ...recipe, [name]: value })
-  };
+  }, [setRecipe, recipe]);
 
-  const fetchIngredientsEventHandler =  (e) => {
-    const ingredientName = e.target.value;
+  const fetchIngredientsEventHandler = (e: any) => {
+    const ingredientName = e.target?.value;
     if (ingredientName) {
-      fetchIngredientsStartingWith(ingredientName).then(({ response, error }) => {
-        if (!error) {
-          let ingredientsList = response;
-          setIngredientListFetched({
-            ...ingredientListFetched,
-            ingredientsList: ingredientsList,
-          });
-        }
-        else {
-          //handleError({error: error})
-        }
+      dispatch(fetchIngredientsStartingWithName(ingredientName)).then((response) => {
+        let ingredientsList = response.payload as Ingredient[] || [];
+        setIngredientListFetched({
+          ...ingredientListFetched,
+          ingredientsList: ingredientsList,
+        });
       });
     }
   }
 
 
-  const changeRecipeIngredient = (targetName, targetValue, uuid) => {
+  const changeRecipeIngredient = useCallback((targetName: string, targetValue: string, uuid?: string) => {
     const name = targetName.split("_")[2].trim();
     const value = targetValue.trim();
 
@@ -141,11 +119,12 @@ const AddModifyRecipe = () => {
       let ingredient1 = ingredientListFetched.ingredientsList.find((ingredient) => equalsIgnoringCase(ingredient.name, value));
       setRecipe((recipe) => {
         let ll = recipe.recipeIngredients.map((recipeIngredient) => {
-          if (equalsIgnoringCase(recipeIngredient.uuid, uuid)) {
-            return {
+          if (uuid && recipeIngredient.uuid && equalsIgnoringCase(recipeIngredient.uuid, uuid)) {
+            const ri = {
               ...recipeIngredient,
-              ingredient: (ingredient1 === undefined) ? { [name]: convertStringToCapitalCamelCase(value) } : {...ingredient1, [name]: convertStringToCapitalCamelCase(value)},
+              ingredient: (ingredient1 === undefined) ? { ...recipeIngredient.ingredient, [name]: value } : {...ingredient1, [name]: value},
             };
+            return ri;
           }
           return recipeIngredient;
         });
@@ -153,10 +132,9 @@ const AddModifyRecipe = () => {
       });
     }
     else {
-
       setRecipe((recipe) => {
         let ll = recipe.recipeIngredients.map((recipeIngredient) => {
-          if (equalsIgnoringCase(recipeIngredient.uuid, uuid)) {
+          if (uuid && recipeIngredient.uuid && equalsIgnoringCase(recipeIngredient.uuid, uuid)) {
             return { ...recipeIngredient, ingredient: { ...recipeIngredient.ingredient }, [name]: value };
           }
           return recipeIngredient;
@@ -164,48 +142,44 @@ const AddModifyRecipe = () => {
         return { ...recipe, recipeIngredients: ll };
       });
     }
-  }
+  }, [setRecipe, ingredientListFetched])
 
-  const addNewIngredient = (e) => {
-    setRecipe(recipe => {
+  const addNewIngredient = useCallback((_: any) => {
+    setRecipe((recipe) => {
       return {
         ...recipe,
         recipeIngredients: [
           ...recipe.recipeIngredients,
           {
             ingredient: {
-              name: "",
+              name: '',
             },
-            quantity: null,
-            uom: null,
             uuid: uuidv4()
           }
         ],
       };
     });
-  }
+  }, [setRecipe])
 
-  const removeIngredient = (e, uuid) => {
+  const removeIngredient = useCallback((_: any, uuid?: string) => {
     setRecipe(recipe => {
-      let ll = recipe.recipeIngredients.filter(recipeIngredient => !equalsIgnoringCase(recipeIngredient.uuid, uuid));
+      let ll = recipe.recipeIngredients.filter(recipeIngredient => !equalsIgnoringCase(recipeIngredient.uuid!, uuid!));
       return {...recipe, recipeIngredients: ll};
     });
-  }
+  }, [setRecipe])
   
-  const submitHandler = (e) => {
+  const submitHandler = useCallback(async (e: Event) => {
     e.preventDefault();
-      addOrModifyRecipe(recipe, mode).then(({ response, error }) => {
-        if (error) {
-          handleError({ error: error });
-        } else {
-          const apiMessageResponse = response;
-          if (mode === "ADD") {
-            setRecipe({ ...recipe, id: apiMessageResponse.generatedId });
-          }
-          history.push('/');
-        }
-      });
-  }
+    let thunkResponse;
+    if (mode === 'MODIFY') {
+      thunkResponse = await dispatch(modifyRecipe(recipe)).unwrap();
+    } else {
+      thunkResponse = await dispatch(addRecipe(recipe)).unwrap();
+    }
+    if (thunkResponse === ThunkResponse.SUCCESS) {
+      history.push('/');
+    }
+  }, [recipe, dispatch, mode])
 
     return (
       <div style={{ height: "80vh", maxHeight: "80vh" }}>
@@ -277,11 +251,10 @@ const AddModifyRecipe = () => {
                       return (
                         <ListGroupItem
                           key={recipeIngredient.uuid}
-                          className="border-0"
+                          className="border-0 px-0 d-flex"
                         >
                           <InputGroup>
                             <FormControl
-                              className="mx-1"
                               id={`recipeIngredient_${recipeIngredient.uuid}_name`}
                               name={`recipeIngredient_${recipeIngredient.uuid}_name`}
                               placeholder="Ingredient name"
@@ -292,7 +265,7 @@ const AddModifyRecipe = () => {
                                 recipeIngredient.id !== undefined
                               }
                               list="ingredientsList"
-                              onChange={(e) => {
+                              onChange={(e: any) => {
                                 e.preventDefault();
                                 debounced(fetchIngredientsEventHandler, 300, e);
                                 changeRecipeIngredient(
@@ -300,6 +273,13 @@ const AddModifyRecipe = () => {
                                   e.target.value,
                                   recipeIngredient.uuid
                                 );
+                              }}
+                              onBlur={(e: any) => {
+                                changeRecipeIngredient(
+                                  e.target.name,
+                                  convertStringToCapitalCamelCase(e.target.value),
+                                  recipeIngredient.uuid
+                                );                                
                               }}
                             />
                             <datalist id="ingredientsList">
@@ -315,13 +295,12 @@ const AddModifyRecipe = () => {
                             </datalist>
                             <InputGroup.Append>
                               <FormControl
-                                className="mx-1"
                                 id={`recipeIngredient_${recipeIngredient.uuid}_quantity`}
                                 name={`recipeIngredient_${recipeIngredient.uuid}_quantity`}
                                 placeholder="measurement"
                                 aria-describedby="basic-addon2"
                                 value={recipeIngredient.quantity}
-                                onChange={(e) =>
+                                onChange={(e: any) =>
                                   changeRecipeIngredient(
                                     e.target.name,
                                     e.target.value,
@@ -333,12 +312,12 @@ const AddModifyRecipe = () => {
 
                             <InputGroup.Append>
                               <Form.Control
-                                className="mx-1"
                                 id={`recipeIngredient_${recipeIngredient.ingredient.name}_uom`}
                                 name={`recipeIngredient_${recipeIngredient.ingredient.name}_uom`}
                                 as="select"
                                 value={recipeIngredient.uom}
-                                onChange={(e) =>
+                                
+                                onChange={(e: any) =>
                                   changeRecipeIngredient(
                                     e.target.name,
                                     e.target.value,
@@ -354,7 +333,7 @@ const AddModifyRecipe = () => {
 
                             <InputGroup.Append>
                               <button
-                                className="link-button my-2 mx-3"
+                                className="link-button my-2 mx-2"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   removeIngredient(e, recipeIngredient.uuid);

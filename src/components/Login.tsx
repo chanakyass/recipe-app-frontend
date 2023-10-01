@@ -1,41 +1,53 @@
 import history from "../app-history";
-import { loginUser } from "./services/user-service";
 import { Col, Form, Button } from 'react-bootstrap';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { withRouter } from "react-router-dom";
+import { ThunkResponse, useAppDispatch, useErrorSelector } from "../store/store.model";
+import { loginUser } from "../store/userSlice";
 
 const Login = () => {
 
+    const dispatch = useAppDispatch();
+
+    const errorInLogin = useErrorSelector((state) => state.notifications.errors.find((error) => error.resourceType === 'user'
+      && error.action === 'LOGIN'));
+
     const [validations, setValidations] = useState({
-        statusCode: null,
+        statusCode: 0,
         message: "",
         timestamp: "",
-        details: [],
+        details: [] as string[],
+        URI: '',
     });
+
+    useEffect(() => {
+      if (errorInLogin?.errorType === 'VALIDATION') {
+        setValidations(errorInLogin.error!);
+      }
+    }, [setValidations, errorInLogin])
 
     const [creds, setCreds] = useState({
         username: "",
         password: "",
     });
 
+    const changeDefaults = (e: any) => {
+      const name = e.target.name;
+      const value = e.target.value;
+      setCreds({ ...creds, [name]: value });
+    };
 
-        const changeDefaults = (e) => {
-          const name = e.target.name;
-          const value = e.target.value;
-          setCreds({ ...creds, [name]: value });
-        };
 
-
-    const submitHandler = (e) => {
+    const submitHandler = async (e: any) => {
         e.preventDefault();
-        loginUser(creds).then(({ response, error }) => {
-            if (!error) {
-                history.push("/");
-            }
-            else {
-                setValidations({ ...validations, ...error });
-            }
-        });
+        try {
+          const thunkResponse = await dispatch(loginUser(creds)).unwrap();
+          if (thunkResponse === ThunkResponse.SUCCESS) {
+            history.push('/');
+          }
+        } catch(error) {
+          console.log(error);
+        }
     }
 
     return (

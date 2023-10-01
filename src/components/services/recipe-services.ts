@@ -1,8 +1,9 @@
 import { baseURI } from "../../util/api-config";
-import cookie from 'react-cookies';
-import moment from "moment";
+import * as cookie from 'react-cookies';
+import * as moment from "moment";
+import { APICallError, ApiMessageResponse, Ingredient, Recipe, ResponseObject } from "./service.model";
 
-export const fetchIngredientsStartingWith = async (name) => {
+export const fetchIngredientsStartingWith = async (name: string): Promise<ResponseObject<Ingredient[]>> => {
   const jwtToken = cookie.load("jwt");
     const requestOptions = {
         method: "GET",
@@ -19,7 +20,7 @@ export const fetchIngredientsStartingWith = async (name) => {
     );
 
     if (response.status !== 200) {
-      const apiCallError = response.json();
+      const apiCallError: APICallError = await response.json();
       return { response: null, error: apiCallError };
     }
 
@@ -33,7 +34,7 @@ export const fetchIngredientsStartingWith = async (name) => {
   }
 }
 
-export const addOrModifyRecipe = async (recipe, mode) => {
+export const addOrModifyRecipe = async (recipe: Recipe, mode: string): Promise<ResponseObject<ApiMessageResponse>> => {
   const jwtToken = cookie.load("jwt");
   let body = null;
   if (mode !== "MODIFY") {
@@ -69,7 +70,7 @@ export const addOrModifyRecipe = async (recipe, mode) => {
 
 }
 
-export const getRecipes = async () => {
+export const getRecipes = async (): Promise<ResponseObject<Recipe[]>> => {
   const jwtToken = cookie.load("jwt");
   const requestOptions = {
     method: "GET",
@@ -96,7 +97,7 @@ export const getRecipes = async () => {
 
 }
 
-export const getRecipe = async (id) => {
+export const getRecipe = async (id: number): Promise<ResponseObject<Recipe>> => {
     const jwtToken = cookie.load("jwt");
     const requestOptions = {
       method: "GET",
@@ -121,7 +122,7 @@ export const getRecipe = async (id) => {
   }
 }
 
-export const deleteRecipe = async (id) => {
+export const deleteRecipe = async (id: number): Promise<ResponseObject<ApiMessageResponse>> => {
   const jwtToken = cookie.load("jwt");
   const requestOptions = {
     method: "DELETE",

@@ -1,8 +1,9 @@
 import history from "../app-history";
-import cookie from "react-cookies";
-import moment from "moment";
+import * as cookie from "react-cookies";
+import * as moment from "moment";
+import { APICallError } from "../components/services/service.model";
 
-export const handleError = ({ error }) => {
+const handleError = ({ error }: { error: APICallError}) => {
   console.log(error);
 
   if (
@@ -26,3 +27,5 @@ export const handleError = ({ error }) => {
     history.push("/error", error);
   }
 };
+
+export default handleError;
