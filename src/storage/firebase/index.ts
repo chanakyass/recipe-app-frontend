@@ -1,0 +1,1 @@
+export * as firebaseStorage from './firebase.service';
