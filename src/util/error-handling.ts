@@ -1,7 +1,7 @@
 import history from "../app-history";
 import * as cookie from "react-cookies";
 import * as moment from "moment";
-import { APICallError } from "../components/services/service.model";
+import { APICallError } from "../services/service.model";
 
 const handleError = ({ error }: { error: APICallError}) => {
   console.log(error);

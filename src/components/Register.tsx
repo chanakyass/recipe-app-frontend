@@ -3,8 +3,8 @@ import { Button, Col, Form } from "react-bootstrap";
 import { withRouter } from "react-router-dom";
 import history from "../app-history";
 import { ThunkResponse, useAppDispatch, useErrorSelector } from "../store/store.model";
-import { loginUser, registerUser } from "../store/userSlice";
-import { isValid } from "./services/user-service";
+import { loginUser, registerUser } from "../store/user";
+import { userApi } from "../services";
 
 const defaultUser = {
   id: undefined,
@@ -73,7 +73,7 @@ useEffect(() => {
   const submitHandler = async (e: any) => {
       e.preventDefault();
       const fieldErrors = { ...defaultValidations.fieldErrors };
-      if (isValid(user, fieldErrors, "POST")) {
+      if (userApi.isValid(user, fieldErrors, "POST")) {
         try {
           const thunkResponse = await dispatch(registerUser(user)).unwrap();
           if (thunkResponse === ThunkResponse.SUCCESS) {

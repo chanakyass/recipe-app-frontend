@@ -1,8 +1,8 @@
-import { baseURI } from "../../util/api-config";
+import { baseURI } from "../util/api-config";
 import * as cookie from 'react-cookies';
 import * as moment from "moment";
 import { APICallError, ApiMessageResponse, Ingredient, Recipe, ResponseObject } from "./service.model";
-import storageApi from "../../storage";
+import storageApi from "../storage";
 import { v4 } from "uuid";
 
 export const fetchIngredientsStartingWith = async (name: string): Promise<ResponseObject<Ingredient[]>> => {
@@ -142,9 +142,11 @@ export const deleteRecipe = async (recipe: Recipe): Promise<ResponseObject<ApiMe
     },
   };
   try {
-    const { response: _, error } = await storageApi.deleteImageFromStorage(recipe.recipeImageAddress);
-    if (error) {
-      throw error;
+    if (recipe.recipeImageAddress) {
+      const { error } = await storageApi.deleteImageFromStorage(recipe.recipeImageAddress);
+      if (error) {
+        throw error;
+      }
     }
     const response = await fetch(`${baseURI}/recipe/${recipe.id}`, requestOptions);
 

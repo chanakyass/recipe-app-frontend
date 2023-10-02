@@ -6,7 +6,7 @@ import {
 import * as cookie from 'react-cookies';
 import history from "../app-history";
 import { ModalProps, SetModalPropsType } from "../customHooks";
-import { deleteRecipe } from "../store/recipeSlice";
+import { deleteRecipe } from "../store/recipe";
 import { Recipe, ThunkResponse, useAppDispatch } from "../store/store.model";
 import { convertDateToReadableFormat } from "../util/utility-functions";
 

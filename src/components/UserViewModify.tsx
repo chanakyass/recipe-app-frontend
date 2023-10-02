@@ -7,8 +7,8 @@ import { Button, Col, Form, InputGroup } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import history from "../app-history";
 import { APICallError, ThunkResponse, User, useAppDispatch, useErrorSelector, useUserSelector } from "../store/store.model";
-import { getUser, modifyUser as modifyUserService } from "../store/userSlice";
-import { isValid } from "./services/user-service";
+import { getUser, modifyUser as modifyUserService } from "../store/user";
+import { userApi } from "../services";
 import withLoading from "./LoadingPage";
 
 const defaultUser = {
@@ -109,7 +109,7 @@ const UserViewModify = () => {
       userSummaryError: "",
     };
 
-    if (isValid(user, fieldErrors, "PUT")) {
+    if (userApi.isValid(user, fieldErrors, "PUT")) {
       dispatch(modifyUserService(user)).unwrap().then((thunkResponse) => {
         if (thunkResponse === ThunkResponse.SUCCESS) {
           history.push('/');

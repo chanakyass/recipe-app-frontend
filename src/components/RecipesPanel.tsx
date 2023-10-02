@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import history from "../app-history";
 import { useModalState } from "../customHooks";
-import { getRecipeList } from "../store/recipeSlice";
+import { getRecipeList } from "../store/recipe";
 import { Recipe, useAppDispatch, useRecipeSelector } from "../store/store.model";
 import CompleteRecipeCardModal from "./CompleteRecipeCardModal";
 import RecipeCard from "./RecipeCard";

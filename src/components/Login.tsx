@@ -3,7 +3,7 @@ import { Col, Form, Button } from 'react-bootstrap';
 import { useEffect, useState } from "react";
 import { withRouter } from "react-router-dom";
 import { ThunkResponse, useAppDispatch, useErrorSelector } from "../store/store.model";
-import { loginUser } from "../store/userSlice";
+import { loginUser } from "../store/user";
 
 const Login = () => {
 

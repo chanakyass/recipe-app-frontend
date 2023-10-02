@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useAppDispatch, useErrorSelector } from "../store/store.model"
-import { showNotifications } from "../store/notificationSlice";
+import { showNotifications } from "../store/notification";
 import Toast from 'react-bootstrap/Toast';
 import { debounced } from "../util/utility-functions";
 

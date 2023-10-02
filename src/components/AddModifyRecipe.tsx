@@ -3,7 +3,7 @@ import { Button, Col, Form, FormControl, InputGroup, ListGroup, ListGroupItem } 
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import history from "../app-history";
-import { addRecipe, fetchIngredientsStartingWithName, modifyRecipe } from "../store/recipeSlice";
+import { addRecipe, fetchIngredientsStartingWithName, modifyRecipe } from "../store/recipe";
 import { Ingredient, Recipe, RecipeIngredient, ThunkResponse, UserProxy, useAppDispatch, useRecipeSelector, useUserSelector } from "../store/store.model";
 import { convertStringToCapitalCamelCase, debounced, equalsIgnoringCase } from "../util/utility-functions";
 

@@ -1,4 +1,4 @@
-import { baseURI } from "../../util/api-config";
+import { baseURI } from "../util/api-config";
 import * as cookie from 'react-cookies';
 import { ApiMessageResponse, AuthRequest, ResponseObject, User, UserProxy } from "./service.model";
 

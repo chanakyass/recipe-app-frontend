@@ -9,7 +9,7 @@ import * as cookie from 'react-cookies';
 import { Route, Router, Switch } from "react-router";
 import history from "../app-history";
 import { useAppDispatch, useRecipeSelector, useUserSelector } from "../store/store.model";
-import { getUser } from "../store/userSlice";
+import { getUser } from "../store/user";
 import AppToast from "./AppToast";
 import ErrorPage from "./ErrorPage";
 import RecipesPanel from "./RecipesPanel";
