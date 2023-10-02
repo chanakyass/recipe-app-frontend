@@ -50,6 +50,7 @@ export interface Recipe {
     cookingInstructions: string;
     recipeIngredients: RecipeIngredient[];
     user: UserProxy;
+    image?: File;
 }
 
 export interface Resource {
@@ -84,7 +85,6 @@ export interface NotificationState {
     errors: Notification[];
     notifications: Notification[];
     errorInView: boolean;
-    notificationInView: boolean;
     currentNotificationMessage: string;
     triggerNotification: boolean;
 }

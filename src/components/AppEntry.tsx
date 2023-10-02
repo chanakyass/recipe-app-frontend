@@ -3,17 +3,16 @@ import UserViewModify from "./UserViewModify";
 import AddModifyRecipe from "./AddModifyRecipe";
 import NavBar from './NavBar';
 
-import { Route, Router, Switch } from "react-router";
-import history from "../app-history";
-import ErrorPage from "./ErrorPage";
-import RecipesPanel from "./RecipesPanel";
+import jwtDecode from "jwt-decode";
 import { useEffect } from "react";
 import * as cookie from 'react-cookies';
+import { Route, Router, Switch } from "react-router";
+import history from "../app-history";
 import { useAppDispatch, useRecipeSelector, useUserSelector } from "../store/store.model";
 import { getUser } from "../store/userSlice";
-import jwtDecode from "jwt-decode";
-import withLoading from "./LoadingPage";
 import AppToast from "./AppToast";
+import ErrorPage from "./ErrorPage";
+import RecipesPanel from "./RecipesPanel";
 
 const AppEntry = () => {
 
@@ -31,10 +30,10 @@ const AppEntry = () => {
       const decodedJwt = jwtDecode(jwt) as any;
       const id = decodedJwt.sub?.split(':')[0];
       if (id) {
-        dispatch(getUser({ id: parseInt(id), isLoggedInUser: true }));
+        dispatch(getUser({ id: parseInt(id), setLoggedInUser: true }));
       }
     }
-  }, [currentUser, dispatch])
+  }, [currentUser.id, dispatch])
 
   return (
     <Router history={history}>

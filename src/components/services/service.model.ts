@@ -60,9 +60,10 @@ export interface Recipe {
     description: string;
     createdOn: string;
     itemType: string;
-    serving: number;
+    serving: number | string;
     recipeImageAddress: string;
     cookingInstructions: string;
     recipeIngredients: RecipeIngredient[];
     user: UserProxy;
+    image?: File;
 }

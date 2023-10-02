@@ -9,7 +9,6 @@ const notificationSlice = createSlice<NotificationState, SliceCaseReducers<Notif
       errors: [],
       notifications: [],
       errorInView: false,
-      notificationInView: false,
       currentNotificationMessage: '',
       triggerNotification: false,
     },
@@ -22,7 +21,6 @@ const notificationSlice = createSlice<NotificationState, SliceCaseReducers<Notif
         notificationAdded(state, action) {
             const { payload: notification } = action;
             state.notifications = [...state.notifications, notification];
-            state.notificationInView = true;
         },
         notificationRemoved(state) {
             if (state.notifications.length > 1) {
@@ -39,11 +37,6 @@ const notificationSlice = createSlice<NotificationState, SliceCaseReducers<Notif
             const { payload: triggerNotification } = action as { payload: boolean };
             state.triggerNotification = triggerNotification;
         },
-        setNotificationInView(state, action) {
-            console.log(action.payload)
-            const { payload: notificationInView } = action as { payload: boolean };
-            state.notificationInView = notificationInView;            
-        }
     },
 });
 
@@ -71,7 +64,9 @@ export const showNotifications = createAsyncThunk('notifications/showNotificatio
             if (notfnState.notifications.length === 0) {
                 break;
             }
-            setTimeout(() => ((ntfnMsg: string) => dispatch(setCurrentNotificationMessage(ntfnMsg)))(notfnState.notifications[0].message!), delay);
+            setTimeout(() => ((ntfnMsg: string) => {
+                dispatch(setCurrentNotificationMessage(ntfnMsg));
+            })(notfnState.notifications[0].message!), delay);
             delay += 3000;
             dispatch(notificationRemoved({}));
             setTimeout(() => dispatch(setCurrentNotificationMessage('')), delay);

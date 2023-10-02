@@ -33,7 +33,7 @@ export const convertDateToReadableFormat = (itemUTCString: string) => {
   return "Not provided";
 };
 
-function debounce(): Function {
+function debounce() {
   let timer: NodeJS.Timeout;
   return function (fn: Function, delay: number, ...args: any[]) {
     clearTimeout(timer);

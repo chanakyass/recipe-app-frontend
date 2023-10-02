@@ -1,9 +1,9 @@
 import { SliceCaseReducers, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { v4 as uuidv4 } from 'uuid';
 import * as recipeApi from "../components/services/recipe-services";
 import { ResponseObject } from "../components/services/service.model";
-import { errorAdded, handleError, handleNotification, notificationAdded } from "./notificationSlice";
+import { handleError, handleNotification } from "./notificationSlice";
 import { Notification, Recipe, ResourceState, ThunkResponse } from "./store.model";
-import { v4 as uuidv4 } from 'uuid';
 
 const recipeSlice = createSlice<ResourceState<Recipe>, SliceCaseReducers<ResourceState<Recipe>>, string>({
     name: 'recipes',
@@ -74,9 +74,6 @@ export const addRecipe = createAsyncThunk("recipes/addRecipe", async(recipe: Rec
         };
         dispatch(recipeAdded(generatedRecipe));
         dispatch(handleNotification({ resourceId: response?.generatedId, ...notification, message: response?.message }));
-        dispatch(handleNotification({ resourceId: response?.generatedId, ...notification, message: response?.message }));
-        dispatch(handleNotification({ resourceId: response?.generatedId, ...notification, message: response?.message }));
-        dispatch(handleNotification({ resourceId: response?.generatedId, ...notification, message: response?.message }));
         return ThunkResponse.SUCCESS;
     }
 });
@@ -94,15 +91,15 @@ export const modifyRecipe = createAsyncThunk("recipes/modifyRecipe", async(recip
     }
 });
 
-export const deleteRecipe = createAsyncThunk("recipes/deleteRecipe", async (recipeId: number, { getState, dispatch }) => {
-    const { response, error } = await recipeApi.deleteRecipe(recipeId);
-    let notification: Partial<Notification> = { resourceType: 'recipe', action: 'DELETE', resourceId: recipeId };
+export const deleteRecipe = createAsyncThunk("recipes/deleteRecipe", async (recipe: Recipe, { getState, dispatch }) => {
+    const { response, error } = await recipeApi.deleteRecipe(recipe);
+    let notification: Partial<Notification> = { resourceType: 'recipe', action: 'DELETE', resourceId: recipe.id };
     if (error) {
-        dispatch(errorAdded({ error, ...notification }));
+        dispatch(handleError({ error, ...notification }));
         return ThunkResponse.FAILURE;
     } else {
-        dispatch(recipeDeleted(recipeId));
-        dispatch(notificationAdded({ ...notification, resourceId: recipeId, message: response?.message } as Notification));
+        dispatch(recipeDeleted(recipe.id));
+        dispatch(handleNotification({ resourceId: response?.generatedId, ...notification, message: response?.message }));
         return ThunkResponse.SUCCESS;
     }
 });

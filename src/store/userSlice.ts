@@ -27,14 +27,14 @@ const userSlice = createSlice<UserState, SliceCaseReducers<UserState>, string>({
 
 export const { userAdded, userModified, setLoading } = userSlice.actions;
 
-export const getUser = createAsyncThunk("users/getUser", async({ id, isLoggedInUser }: { id: number, isLoggedInUser: boolean }, { dispatch }) => {
+export const getUser = createAsyncThunk("users/getUser", async({ id, setLoggedInUser }: { id: number, setLoggedInUser: boolean }, { dispatch }) => {
     dispatch(setLoading(true));
     const { response: user, error }  = await userApi.getUser(id);
     const notification: Partial<Notification> = { resourceType: 'user', action: 'READ' };
     if (error) {
         dispatch(handleError({ ...notification, error }));
     } else {
-        if (isLoggedInUser) {
+        if (setLoggedInUser) {
             dispatch(userAdded(user));
         }
     }

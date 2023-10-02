@@ -61,13 +61,17 @@ const UserViewModify = () => {
   const { id } = useParams<{ id: string }>();
 
   const loadUser = useCallback(() => {
-    dispatch(getUser({id: parseInt(id), isLoggedInUser: false })).unwrap().then((user) => {
-      if (user && user?.id === loggedInUser.id) {
-        setIsLoggedInUser(true);
-        setUser(user)
-      }
-    });
-  }, [loggedInUser.id, id, dispatch]);
+    if (id && loggedInUser.id && (id.toString() !== loggedInUser.id.toString())) {
+      dispatch(getUser({id: parseInt(id), setLoggedInUser: false })).unwrap().then((user) => {
+        if (user) {
+          setUser(user);
+        }
+      });
+    } else {
+      setUser(loggedInUser);
+      setIsLoggedInUser(true);
+    }
+  }, [loggedInUser, id, dispatch, setUser, setIsLoggedInUser]);
 
   useEffect(() => {
     loadUser();

@@ -20,9 +20,9 @@ const CompleteRecipeCardModal = ({ modalProps, setModalProps }: { modalProps: Mo
     const currentUser = cookie.load('current_user');
     const dispatch = useAppDispatch();
 
-    const deleteHandler = useCallback((e: Event, recipeId: number) => {
+    const deleteHandler = useCallback((e: Event, recipe: Recipe) => {
         e.preventDefault();
-        dispatch(deleteRecipe(recipeId)).unwrap().then((thunkResponse) => {
+        dispatch(deleteRecipe(recipe)).unwrap().then((thunkResponse) => {
             if (thunkResponse === ThunkResponse.SUCCESS) {
                 setModalProps({ ...modalProps!, showModal: false });
                 history.push('/');
@@ -32,7 +32,7 @@ const CompleteRecipeCardModal = ({ modalProps, setModalProps }: { modalProps: Mo
 
     
     return <>
-            <Modal aria-labelledby="contained-modal-title-vcenter" size="md" show={showModal}>
+            <Modal aria-labelledby="contained-modal-title-vcenter" size="md" show={showModal} onHide={() => setModalProps({...modalProps, showModal: false})}>
             <Modal.Header closeButton>
             </Modal.Header>
             <Modal.Body>
@@ -85,7 +85,7 @@ const CompleteRecipeCardModal = ({ modalProps, setModalProps }: { modalProps: Mo
             </Modal.Body>
             <Modal.Footer>
                 {currentUser.id === recipe.user.id && <Button onClick={() => history.push({ pathname: `/recipe/${recipe.id}`, state: { data: recipe, mode: 'MODIFY' } })}>Modify</Button>}
-                {currentUser.id === recipe.user.id && <Button onClick={(e: Event) => deleteHandler(e, recipe.id!)}>Delete</Button>}
+                {currentUser.id === recipe.user.id && <Button onClick={(e: Event) => deleteHandler(e, recipe)}>Delete</Button>}
                 <Button onClick={() => setModalProps({resource: recipe, showModal: false})}>Close</Button>
             </Modal.Footer>
             </Modal>

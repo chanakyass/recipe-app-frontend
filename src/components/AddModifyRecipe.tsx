@@ -3,10 +3,8 @@ import { Button, Col, Form, FormControl, InputGroup, ListGroup, ListGroupItem } 
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import history from "../app-history";
-import { storage } from "../firebase";
 import { addRecipe, fetchIngredientsStartingWithName, modifyRecipe } from "../store/recipeSlice";
-import { APICallError, Ingredient, Recipe, RecipeIngredient, ThunkResponse, UserProxy, useAppDispatch, useRecipeSelector, useUserSelector } from "../store/store.model";
-import navigateToErrorPage from "../util/error-handling";
+import { Ingredient, Recipe, RecipeIngredient, ThunkResponse, UserProxy, useAppDispatch, useRecipeSelector, useUserSelector } from "../store/store.model";
 import { convertStringToCapitalCamelCase, debounced, equalsIgnoringCase } from "../util/utility-functions";
 
 const AddModifyRecipe = () => {
@@ -25,8 +23,6 @@ const AddModifyRecipe = () => {
     user: {} as UserProxy
   } as Recipe);
 
-  const [image, setImage] = useState({} as { [key: string]: any });
-  const [progress, setProgress] = useState("");
   const [ingredientListFetched, setIngredientListFetched] = useState({ingredientsList: [] as Ingredient[]});
 
 
@@ -34,13 +30,23 @@ const AddModifyRecipe = () => {
 
   const [mode, setMode] = useState('');
 
+  const loggedInUser = useUserSelector((state) => state.users.loggedInUser);
+
   useEffect(() => {
     if (id !== "new") {
       setMode('MODIFY');
     } else {
       setMode('ADD');
+      setRecipe((recipe) => ({
+        ...recipe,
+        user: {
+          id: loggedInUser.id!,
+          email: loggedInUser.email,
+          profileName: loggedInUser.profileName,
+        }
+      }));
     }
-  }, [id])
+  }, [id, loggedInUser, setRecipe])
 
   const recipeToModify = useRecipeSelector((state) => {
     if (id !== 'new') {
@@ -56,38 +62,15 @@ const AddModifyRecipe = () => {
     }
   }, [recipeToModify, setRecipe]);
 
-  const loggedInUser = useUserSelector((state) => state.users.loggedInUser);
-
-  const handleChange = (e: any) => {
+  const handleChange = useCallback((e: any) => {
     e.preventDefault();
-      if (e.target?.files[0]) {
-        setImage(e.target.files[0]);
-      }
-  };
-  
-  const handleUpload = useCallback((e: any) => {
-    e.preventDefault();
-    const uploadTask = storage.ref(`images/${loggedInUser.id}/${image.name}`).put(image as Blob);
-    uploadTask.on(
-      "state_changed",
-      (_) => {
-          setProgress("wait");
-      },
-      (error) => {
-        navigateToErrorPage({error: error as unknown as APICallError});
-      },
-      () => {
-        setProgress("done");
-        storage
-          .ref(`images/${loggedInUser.id}`)
-          .child(image.name)
-          .getDownloadURL()
-          .then((url) => {
-            setRecipe({ ...recipe, recipeImageAddress: url });
-          });
-      }
-    );
-  }, [setProgress, setRecipe, image, loggedInUser.id, recipe]);
+    if (e.target?.files[0]) {
+      setRecipe((recipe) => ({
+        ...recipe,
+        image: e.target.files[0],
+      }));
+    }
+  }, [setRecipe]);
   
   const uomList = ["Select", "MILLIGRAMS", "GRAMS", "KILOGRAMS", "MILLILITRES", "LITRES", "TEA_SPOON", "TABLE_SPOON", "NUMBER"];
 
@@ -113,7 +96,7 @@ const AddModifyRecipe = () => {
 
   const changeRecipeIngredient = useCallback((targetName: string, targetValue: string, uuid?: string) => {
     const name = targetName.split("_")[2].trim();
-    const value = targetValue.trim();
+    const value = targetValue.replace(/\s+/g, ' ');
 
     if (equalsIgnoringCase(name, "name")) {
       let ingredient1 = ingredientListFetched.ingredientsList.find((ingredient) => equalsIgnoringCase(ingredient.name, value));
@@ -207,8 +190,6 @@ const AddModifyRecipe = () => {
                   name="recipeImageAddress"
                   onChange={handleChange}
                 />
-                <button className="link-button" onClick={handleUpload}>Upload image</button>
-                <div>{progress}</div>
               </Form.Group>
 
               <Form.Group as={Col} md={12}>
@@ -223,13 +204,25 @@ const AddModifyRecipe = () => {
               </Form.Group>
 
               <Form.Group as={Col} md={12}>
-                <Form.Label>Veg or Non Veg</Form.Label>
-                <Form.Control
-                  id="itemType"
+                <Form.Check
+                  inline
+                  label="Veg"
                   name="itemType"
-                  type="text"
-                  value={recipe.itemType}
+                  type='radio'
+                  id='itemType'
+                  value='VEG'
                   onChange={changeDefaults}
+                  checked={recipe.itemType === 'VEG'}
+                />
+                <Form.Check
+                  inline
+                  label="Non-Veg"
+                  name="itemType"
+                  type='radio'
+                  id='itemType'
+                  value='NON_VEG'
+                  onChange={changeDefaults}
+                  checked={recipe.itemType === 'NON_VEG'}
                 />
               </Form.Group>
 
