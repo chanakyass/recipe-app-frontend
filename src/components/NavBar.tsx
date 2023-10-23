@@ -7,11 +7,12 @@ import {
 
 import * as React from "react";
 import * as cookie from "react-cookies";
-import history from "../app-history";
 import { useUserSelector } from "../store/store.model";
+import { useHistory } from "react-router";
 
 const NavBar = React.memo(() => {
   const loggedInUser = useUserSelector((state) => state.users.loggedInUser);
+  const history = useHistory();
 
   const logout = (_e: Event) => {
     cookie.remove("jwt", { path: "/" });
@@ -41,7 +42,7 @@ const NavBar = React.memo(() => {
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item href="#">Give feedback</Dropdown.Item>
-                <Dropdown.Item href="#" onClick={(e: Event) => logout(e)}>
+                <Dropdown.Item href="#" onClick={(e: any) => logout(e)}>
                   Logout
                 </Dropdown.Item>
               </DropdownButton>

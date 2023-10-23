@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import moment from "moment";
 
 export function equalsIgnoringCase(text: string, other: string) {
   return text.localeCompare(other, undefined, { sensitivity: "base" }) === 0;
