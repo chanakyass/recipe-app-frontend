@@ -65,7 +65,7 @@
       "!**/src/**/index.ts",
       "!**/src/**/*.model.ts",
       "!**/src/**/setup.ts",
-      "!**/src/tests/**",
+      "!**/src/tests/**/*",
       "!**/react-app-env.d.ts"
     ],
     "coverageThreshold": {
