@@ -83,7 +83,7 @@ const AddModifyRecipe = () => {
   const fetchIngredientsEventHandler = (e: any) => {
     const ingredientName = e.target?.value;
     if (ingredientName) {
-      dispatch(fetchIngredientsStartingWithName(ingredientName)).unwrap().then((ingredients: Ingredient[]) => {
+      dispatch(fetchIngredientsStartingWithName(ingredientName)).unwrap().then((ingredients: Ingredient[] | null) => {
         let ingredientsList = ingredients || [];
         setIngredientListFetched({
           ...ingredientListFetched,
@@ -105,7 +105,7 @@ const AddModifyRecipe = () => {
           if (uuid && recipeIngredient.uuid && equalsIgnoringCase(recipeIngredient.uuid, uuid)) {
             const ri = {
               ...recipeIngredient,
-              ingredient: (ingredient1 === undefined) ? { ...recipeIngredient.ingredient, [name]: value } : {...ingredient1, [name]: value},
+              ingredient: (ingredient1 === undefined) ? { [name]: value } as unknown as Ingredient : {...ingredient1, [name]: value},
             };
             return ri;
           }

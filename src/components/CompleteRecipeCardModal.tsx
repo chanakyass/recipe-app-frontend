@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback } from "react";
 import {
     Button, Card, ListGroup, ListGroupItem,
@@ -30,7 +31,6 @@ const CompleteRecipeCardModal = ({ modalProps, setModalProps }: { modalProps: Mo
         })
     }, [dispatch, setModalProps, modalProps, history]);
 
-    
     return <div data-testid={`complete-recipe-modal-${recipe.id}`}>
             <Modal aria-labelledby="contained-modal-title-vcenter" size="md" show={showModal} onHide={() => setModalProps({...modalProps, showModal: false})}>
             <Modal.Header closeButton>

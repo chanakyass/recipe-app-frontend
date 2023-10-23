@@ -32,7 +32,7 @@ export const fetchIngredientsStartingWith = async (name: string): Promise<Respon
     }
   }
   catch (error) {
-    return { response: null, error: error };
+    return { response: null, error: error as APICallError };
   }
 }
 
@@ -75,7 +75,7 @@ export const addOrModifyRecipe = async (recipe: Recipe, mode: string): Promise<R
     }
   }
   catch (error) {
-    return { response: null, error: error };
+    return { response: null, error: error as APICallError };
   }
 
 }
@@ -102,7 +102,7 @@ export const getRecipes = async (): Promise<ResponseObject<Recipe[]>> => {
     }
   }
   catch (error) {
-    return { response: null, error: error };
+    return { response: null, error: error as APICallError};
   }
 
 }
@@ -128,7 +128,7 @@ export const getRecipe = async (id: number): Promise<ResponseObject<Recipe>> => 
     }
   }
   catch (error) {
-    return { response: null, error: error };
+    return { response: null, error: error as APICallError };
   }
 }
 
@@ -159,6 +159,6 @@ export const deleteRecipe = async (recipe: Recipe): Promise<ResponseObject<ApiMe
     }
   }
   catch (error) {
-    return { response: null, error: error };
+    return { response: null, error: error as APICallError };
   }
 }

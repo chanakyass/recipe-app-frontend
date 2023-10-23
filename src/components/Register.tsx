@@ -114,7 +114,7 @@ useEffect(() => {
                   value={user.firstName}
                   isInvalid={
                     validations.hasError &&
-                    validations.fieldErrors.firstNameError
+                    !!validations.fieldErrors.firstNameError
                   }
                   onChange={changePerson}
                 />
@@ -163,7 +163,7 @@ useEffect(() => {
                   autoComplete="email"
                   onChange={changePerson}
                   isInvalid={
-                    validations.hasError && validations.fieldErrors.emailError
+                    validations.hasError && !!validations.fieldErrors.emailError
                   }
                 />
                 <Form.Text className="text-muted">
@@ -187,7 +187,7 @@ useEffect(() => {
                   autoComplete="nickname"
                   isInvalid={
                     validations.hasError &&
-                    validations.fieldErrors.profileNameError
+                    !!validations.fieldErrors.profileNameError
                   }
                 />
                 <Form.Control.Feedback type="invalid">
@@ -208,7 +208,7 @@ useEffect(() => {
                   onChange={changePerson}
                   isInvalid={
                     validations.hasError &&
-                    validations.fieldErrors.passwordError
+                    !!validations.fieldErrors.passwordError
                   }
                 />
                 <Form.Control.Feedback type="invalid">
@@ -230,7 +230,7 @@ useEffect(() => {
                   }
                   onChange={changePerson}
                   isInvalid={
-                    validations.hasError && validations.fieldErrors.DOBError
+                    validations.hasError && !!validations.fieldErrors.DOBError
                   }
                 />
                 <Form.Control.Feedback type="invalid">

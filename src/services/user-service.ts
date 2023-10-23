@@ -1,6 +1,6 @@
 import { baseURI } from "../util/api-config";
 import * as cookie from 'react-cookies';
-import { ApiMessageResponse, AuthRequest, ResponseObject, User, UserProxy } from "./service.model";
+import { APICallError, ApiMessageResponse, AuthRequest, ResponseObject, User, UserProxy } from "./service.model";
 
 export const loginUser = async (creds: AuthRequest): Promise<ResponseObject<UserProxy>> => {
 
@@ -31,7 +31,7 @@ export const loginUser = async (creds: AuthRequest): Promise<ResponseObject<User
       return { response: null, error: apiCallError };
     }
   } catch (error) {
-    return { response: null, error: error };
+    return { response: null, error: error as APICallError };
   }
 
 }
@@ -55,7 +55,7 @@ export const registerUser = async (user: User): Promise<ResponseObject<User>> =>
     }
   }
   catch (error) {
-    return { response: null, error: error };
+    return { response: null, error: error as APICallError };
   }
 }
 
@@ -137,7 +137,7 @@ export const getUser = async (id: number): Promise<ResponseObject<User>> => {
       return { response: null, error: apiCallError };
     }
   } catch (error) {
-    return { response: null, error: error };
+    return { response: null, error: error as APICallError };
   }
 }
 
@@ -185,6 +185,6 @@ export const updateUser = async (user: User): Promise<ResponseObject<ApiMessageR
     }
 
   } catch (error) {
-    return { response: null, error: error };
+    return { response: null, error: error as APICallError};
   }
 }

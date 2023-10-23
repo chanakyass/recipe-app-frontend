@@ -8,6 +8,7 @@ import * as recipeActions from '../../store/recipe/recipeActions';
 import { ThunkResponse } from '../../store/store.model';
 import { preloadedState } from '../mocks/store/store.mocks';
 import * as routerComps from 'react-router-dom';
+import { setupConfiguredStore } from '../../store/setup';
 
 const storeMock = jest.requireActual('../../store/setup');
 
@@ -33,8 +34,8 @@ test('Test add recipe', async () => {
     const fn1 = jest.fn().mockReturnValue('fetchIngredientsStartingWithName');
     const fn2 = jest.fn().mockReturnValue('addRecipeSpy');
 
-    jest.spyOn(recipeActions, 'fetchIngredientsStartingWithName').mockReturnValue(fn1);
-    jest.spyOn(recipeActions, 'addRecipe').mockReturnValue(fn2);
+    jest.spyOn(recipeActions, 'fetchIngredientsStartingWithName').mockImplementation(fn1);
+    jest.spyOn(recipeActions, 'addRecipe').mockImplementation(fn2);
     jest.spyOn(routerDom, 'useParams').mockImplementation(() => ({ id: 'new' }));
   
     const { unmount, store: mockStore } = renderWithProviders(<AddModifyRecipe/>, { preloadedState });
@@ -137,28 +138,30 @@ test('Test modify recipe', async () => {
     const fn1 = jest.fn().mockReturnValue('fetchIngredientsStartingWithName');
     const fn2 = jest.fn().mockReturnValue('modifyRecipe');
 
-    jest.spyOn(recipeActions, 'fetchIngredientsStartingWithName').mockReturnValue(fn1);
-    const modifyRecipeSpy = jest.spyOn(recipeActions, 'modifyRecipe').mockReturnValue(fn2);
+    jest.spyOn(recipeActions, 'fetchIngredientsStartingWithName').mockImplementation(fn1);
+    const modifyRecipeSpy = jest.spyOn(recipeActions, 'modifyRecipe').mockImplementation(fn2);
     jest.spyOn(routerDom, 'useParams').mockImplementation(() => ({ id: '11502' }));
-  
-    const { unmount, store: mockStore,  } = renderWithProviders(<AddModifyRecipe/>, { preloadedState });
-  
+
+    const mockStore = setupConfiguredStore(preloadedState);
+
     const dispatchSpy = jest.spyOn(mockStore, 'dispatch').mockImplementation((arg) => {
-      if(arg === fn1()) {
-          return {
-              unwrap: jest.fn().mockResolvedValueOnce([
-                  {
-                      id: 123,
-                      name: 'Chicken'
-                  }                
-              ])
-          };
-      } else {
-          return {
-              unwrap: jest.fn().mockResolvedValueOnce(ThunkResponse.SUCCESS)
-          };
-      }
-    });
+        if(arg === fn1()) {
+            return {
+                unwrap: jest.fn().mockResolvedValue([
+                    {
+                        id: 123,
+                        name: 'Chicken'
+                    }                
+                ])
+            };
+        } else {
+            return {
+                unwrap: jest.fn().mockResolvedValue(ThunkResponse.SUCCESS)
+            };
+        }
+      });
+  
+    const { unmount } = renderWithProviders(<AddModifyRecipe/>, { preloadedState, store: mockStore }, dispatchSpy);
   
     const addModifyRecipeModal = await screen.findByTestId('add-modify-recipe');
     expect(addModifyRecipeModal).toBeDefined();
