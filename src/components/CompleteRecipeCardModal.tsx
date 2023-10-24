@@ -1,23 +1,24 @@
+// @ts-nocheck
 import { useCallback } from "react";
 import {
     Button, Card, ListGroup, ListGroupItem,
     Modal
 } from "react-bootstrap";
-import * as cookie from 'react-cookies';
-import history from "../app-history";
+import { useHistory } from "react-router";
 import { ModalProps, SetModalPropsType } from "../customHooks";
 import { deleteRecipe } from "../store/recipe";
-import { Recipe, ThunkResponse, useAppDispatch } from "../store/store.model";
+import { Recipe, ThunkResponse, useAppDispatch, useUserSelector } from "../store/store.model";
 import { convertDateToReadableFormat } from "../util/utility-functions";
 
 const CompleteRecipeCardModal = ({ modalProps, setModalProps }: { modalProps: ModalProps<Recipe>, setModalProps: SetModalPropsType<Recipe>}) => {
+    const history = useHistory();
     const { resource, showModal } = modalProps;
     const recipe = resource!;
     const vegPng = process.env.PUBLIC_URL + "/veg.png";
     const nonVegPng = process.env.PUBLIC_URL + "/non-veg.png";
     const servingPng = process.env.PUBLIC_URL + "/SERVES.png";
 
-    const currentUser = cookie.load('current_user');
+    const currentUser = useUserSelector((state) => state.users.loggedInUser);
     const dispatch = useAppDispatch();
 
     const deleteHandler = useCallback((e: Event, recipe: Recipe) => {
@@ -28,10 +29,9 @@ const CompleteRecipeCardModal = ({ modalProps, setModalProps }: { modalProps: Mo
                 history.push('/');
             }
         })
-    }, [dispatch, setModalProps, modalProps]);
+    }, [dispatch, setModalProps, modalProps, history]);
 
-    
-    return <>
+    return <div data-testid={`complete-recipe-modal-${recipe.id}`}>
             <Modal aria-labelledby="contained-modal-title-vcenter" size="md" show={showModal} onHide={() => setModalProps({...modalProps, showModal: false})}>
             <Modal.Header closeButton>
             </Modal.Header>
@@ -69,7 +69,7 @@ const CompleteRecipeCardModal = ({ modalProps, setModalProps }: { modalProps: Mo
                             <ListGroup className="list-group-flush">
                                 {
                                     recipe.recipeIngredients.map((recipeIngredient, index) => {
-                                        return (<ListGroupItem>
+                                        return (<ListGroupItem key={recipeIngredient.uuid}>
                                             {
                                                 recipeIngredient.quantity + " " + recipeIngredient.uom + " " + recipeIngredient.ingredient.name
                                             }
@@ -84,12 +84,12 @@ const CompleteRecipeCardModal = ({ modalProps, setModalProps }: { modalProps: Mo
                     </Card>
             </Modal.Body>
             <Modal.Footer>
-                {currentUser.id === recipe.user.id && <Button onClick={() => history.push({ pathname: `/recipe/${recipe.id}`, state: { data: recipe, mode: 'MODIFY' } })}>Modify</Button>}
-                {currentUser.id === recipe.user.id && <Button onClick={(e: Event) => deleteHandler(e, recipe)}>Delete</Button>}
+                {currentUser.id === recipe.user.id && <Button data-testid='modifyRecipeButton' onClick={() => history.push({ pathname: `/recipe/${recipe.id}`, state: { data: recipe, mode: 'MODIFY' } })}>Modify</Button>}
+                {currentUser.id === recipe.user.id && <Button data-testid='deleteRecipeButton' onClick={(e: any) => deleteHandler(e, recipe)}>Delete</Button>}
                 <Button onClick={() => setModalProps({resource: recipe, showModal: false})}>Close</Button>
             </Modal.Footer>
             </Modal>
-        </>
+        </div>
 }
 
 export default CompleteRecipeCardModal;

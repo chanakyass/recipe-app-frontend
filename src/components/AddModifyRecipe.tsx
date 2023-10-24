@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button, Col, Form, FormControl, InputGroup, ListGroup, ListGroupItem } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import history from "../app-history";
 import { addRecipe, fetchIngredientsStartingWithName, modifyRecipe } from "../store/recipe";
 import { Ingredient, Recipe, RecipeIngredient, ThunkResponse, UserProxy, useAppDispatch, useRecipeSelector, useUserSelector } from "../store/store.model";
 import { convertStringToCapitalCamelCase, debounced, equalsIgnoringCase } from "../util/utility-functions";
 
 const AddModifyRecipe = () => {
+
+  const history = useHistory();
 
   const dispatch = useAppDispatch();
 
@@ -25,10 +26,9 @@ const AddModifyRecipe = () => {
 
   const [ingredientListFetched, setIngredientListFetched] = useState({ingredientsList: [] as Ingredient[]});
 
+  const [mode, setMode] = useState('');
 
   const { id } = useParams<{ id: string }>();
-
-  const [mode, setMode] = useState('');
 
   const loggedInUser = useUserSelector((state) => state.users.loggedInUser);
 
@@ -83,8 +83,8 @@ const AddModifyRecipe = () => {
   const fetchIngredientsEventHandler = (e: any) => {
     const ingredientName = e.target?.value;
     if (ingredientName) {
-      dispatch(fetchIngredientsStartingWithName(ingredientName)).then((response) => {
-        let ingredientsList = response.payload as Ingredient[] || [];
+      dispatch(fetchIngredientsStartingWithName(ingredientName)).unwrap().then((ingredients: Ingredient[] | null) => {
+        let ingredientsList = ingredients || [];
         setIngredientListFetched({
           ...ingredientListFetched,
           ingredientsList: ingredientsList,
@@ -105,7 +105,7 @@ const AddModifyRecipe = () => {
           if (uuid && recipeIngredient.uuid && equalsIgnoringCase(recipeIngredient.uuid, uuid)) {
             const ri = {
               ...recipeIngredient,
-              ingredient: (ingredient1 === undefined) ? { ...recipeIngredient.ingredient, [name]: value } : {...ingredient1, [name]: value},
+              ingredient: (ingredient1 === undefined) ? { [name]: value } as unknown as Ingredient : {...ingredient1, [name]: value},
             };
             return ri;
           }
@@ -151,7 +151,7 @@ const AddModifyRecipe = () => {
     });
   }, [setRecipe])
   
-  const submitHandler = useCallback(async (e: Event) => {
+  const submitHandler = useCallback(async (e: any) => {
     e.preventDefault();
     let thunkResponse;
     if (mode === 'MODIFY') {
@@ -162,10 +162,10 @@ const AddModifyRecipe = () => {
     if (thunkResponse === ThunkResponse.SUCCESS) {
       history.push('/');
     }
-  }, [recipe, dispatch, mode])
+  }, [recipe, dispatch, mode, history])
 
     return (
-      <div style={{ height: "80vh", maxHeight: "80vh" }}>
+      <div style={{ height: "80vh", maxHeight: "80vh" }} data-testid='add-modify-recipe'>
         <div className="row h-100 m-4">
           <div className="col-md-5 col-lg-5 col-sm-5 mx-auto my-auto rounded shadow bg-white ">
             <div className="col-md-12 col-sm-12 col-lg-12 mx-auto mt-3">
@@ -178,6 +178,7 @@ const AddModifyRecipe = () => {
                   id="name"
                   name="name"
                   type="text"
+                  data-testid='name'
                   value={recipe.name}
                   onChange={changeDefaults}
                 />
@@ -186,6 +187,7 @@ const AddModifyRecipe = () => {
                 <Form.Label>Recipe Image</Form.Label>
                 <Form.Control
                   type="file"
+                  data-testid='recipeImageAddress'
                   id="recipeImageAddress"
                   name="recipeImageAddress"
                   onChange={handleChange}
@@ -198,6 +200,7 @@ const AddModifyRecipe = () => {
                   id="description"
                   name="description"
                   type="text"
+                  data-testid='description'
                   value={recipe.description}
                   onChange={changeDefaults}
                 />
@@ -206,6 +209,7 @@ const AddModifyRecipe = () => {
               <Form.Group as={Col} md={12}>
                 <Form.Check
                   inline
+                  data-testid='itemType-1'
                   label="Veg"
                   name="itemType"
                   type='radio'
@@ -216,6 +220,7 @@ const AddModifyRecipe = () => {
                 />
                 <Form.Check
                   inline
+                  data-testid='itemType-2'
                   label="Non-Veg"
                   name="itemType"
                   type='radio'
@@ -229,6 +234,7 @@ const AddModifyRecipe = () => {
               <Form.Group as={Col} md={12}>
                 <Form.Label>No of people item can serve</Form.Label>
                 <Form.Control
+                  data-testid='serving'
                   id="serving"
                   name="serving"
                   type="text"
@@ -250,6 +256,7 @@ const AddModifyRecipe = () => {
                             <FormControl
                               id={`recipeIngredient_${recipeIngredient.uuid}_name`}
                               name={`recipeIngredient_${recipeIngredient.uuid}_name`}
+                              data-testid={`recipeIngredient_${recipeIngredient.uuid}_name`}
                               placeholder="Ingredient name"
                               type="text"
                               value={recipeIngredient.ingredient.name}
@@ -282,7 +289,7 @@ const AddModifyRecipe = () => {
                                     let name = convertStringToCapitalCamelCase(
                                       ingredient.name
                                     );
-                                    return <option>{name}</option>;
+                                    return <option key={ingredient.id}>{name}</option>;
                                   }
                                 )}
                             </datalist>
@@ -290,6 +297,7 @@ const AddModifyRecipe = () => {
                               <FormControl
                                 id={`recipeIngredient_${recipeIngredient.uuid}_quantity`}
                                 name={`recipeIngredient_${recipeIngredient.uuid}_quantity`}
+                                data-testid={`recipeIngredient_${recipeIngredient.uuid}_quantity`}
                                 placeholder="measurement"
                                 aria-describedby="basic-addon2"
                                 value={recipeIngredient.quantity}
@@ -307,6 +315,7 @@ const AddModifyRecipe = () => {
                               <Form.Control
                                 id={`recipeIngredient_${recipeIngredient.ingredient.name}_uom`}
                                 name={`recipeIngredient_${recipeIngredient.ingredient.name}_uom`}
+                                data-testid={`recipeIngredient_${recipeIngredient.ingredient.name}_uom`}
                                 as="select"
                                 value={recipeIngredient.uom}
                                 
@@ -318,8 +327,8 @@ const AddModifyRecipe = () => {
                                   )
                                 }
                               >
-                                {uomList.map((uom, index2) => {
-                                  return <option>{uom}</option>;
+                                {uomList.map((uom) => {
+                                  return <option key={uom}>{uom}</option>;
                                 })}
                               </Form.Control>
                             </InputGroup.Append>
@@ -327,6 +336,7 @@ const AddModifyRecipe = () => {
                             <InputGroup.Append>
                               <button
                                 className="link-button my-2 mx-2"
+                                data-testid="remove-ingredient"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   removeIngredient(e, recipeIngredient.uuid);
@@ -343,6 +353,7 @@ const AddModifyRecipe = () => {
 
                   <button
                     className="link-button"
+                    data-testid='add-ingredient'
                     onClick={(e) => {
                       e.preventDefault();
                       addNewIngredient(e);
@@ -356,6 +367,7 @@ const AddModifyRecipe = () => {
                 <Form.Control
                   id="cookingInstructions"
                   name="cookingInstructions"
+                  data-testid='cookingInstructions'
                   as="textarea"
                   rows={10}
                   value={recipe.cookingInstructions}
@@ -363,7 +375,7 @@ const AddModifyRecipe = () => {
                 ></Form.Control>
               </Form.Group>
               <Form.Group as={Col} md={12}>
-                <Button className="my-5" type="submit">
+                <Button className="my-5" type="submit" data-testid='submit'>
                   Submit
                 </Button>
               </Form.Group>

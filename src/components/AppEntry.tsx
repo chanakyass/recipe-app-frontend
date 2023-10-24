@@ -6,8 +6,7 @@ import NavBar from './NavBar';
 import jwtDecode from "jwt-decode";
 import { useEffect } from "react";
 import * as cookie from 'react-cookies';
-import { Route, Router, Switch } from "react-router";
-import history from "../app-history";
+import { Route, Router, Switch, useHistory } from "react-router";
 import { useAppDispatch, useRecipeSelector, useUserSelector } from "../store/store.model";
 import { getUser } from "../store/user";
 import AppToast from "./AppToast";
@@ -23,6 +22,8 @@ const AppEntry = () => {
   const recipeLoading = useRecipeSelector((state) => state.recipes.loading);
 
   const dispatch = useAppDispatch();
+
+  const history = useHistory();
 
   useEffect(() => {
     if (!currentUser.id) {

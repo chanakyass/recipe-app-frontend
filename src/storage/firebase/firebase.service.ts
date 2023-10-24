@@ -7,7 +7,7 @@ export const deleteImageFromStorage = async (recipeImageAddress: string): Promis
         const response = storage.refFromURL(recipeImageAddress).delete();
         return { response, error: null };
     } catch(error) {
-        return { response: null, error };
+        return { response: null, error: error as APICallError };
     }
 }
 

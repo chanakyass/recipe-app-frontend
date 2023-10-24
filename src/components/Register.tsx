@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Form } from "react-bootstrap";
-import { withRouter } from "react-router-dom";
-import history from "../app-history";
+import { useHistory, withRouter } from "react-router-dom";
 import { ThunkResponse, useAppDispatch, useErrorSelector } from "../store/store.model";
 import { loginUser, registerUser } from "../store/user";
 import { userApi } from "../services";
@@ -40,6 +39,8 @@ backendError: {
 
 const Register = () => {
 
+const history = useHistory();
+
 const [user, setUser] = useState(defaultUser);
 
 const [validations, setValidations] = useState(defaultValidations);
@@ -74,20 +75,15 @@ useEffect(() => {
       e.preventDefault();
       const fieldErrors = { ...defaultValidations.fieldErrors };
       if (userApi.isValid(user, fieldErrors, "POST")) {
-        try {
-          const thunkResponse = await dispatch(registerUser(user)).unwrap();
-          if (thunkResponse === ThunkResponse.SUCCESS) {
-            dispatch(loginUser({ username: user.email, password: user.password })).then((response) => {
-              const thunkResponse = response.payload as ThunkResponse;
-              if (thunkResponse === ThunkResponse.SUCCESS) {
-                history.push('/');
-              } else {
-                history.push('/login');
-              }
-            });
-          }
-        } catch(error) {
-          console.log(error);
+        const thunkResponse = await dispatch(registerUser(user)).unwrap();
+        if (thunkResponse === ThunkResponse.SUCCESS) {
+          dispatch(loginUser({ username: user.email, password: user.password })).unwrap().then((thunkResponse) => {
+            if (thunkResponse === ThunkResponse.SUCCESS) {
+              history.push('/');
+            } else {
+              history.push('/login');
+            }
+          });
         }
       } else {
         setValidations({ ...defaultValidations, fieldErrors: fieldErrors, hasError: true });
@@ -107,38 +103,41 @@ useEffect(() => {
                 <h5>Register</h5>
               </div>
 
-              <Form.Group as={Col} md={12} controlId="firstName">
+              <Form.Group as={Col} md={12}>
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
                   id="firstName"
                   name="firstName"
+                  data-testid="firstName"
                   type="text"
                   placeholder="Enter your first name"
                   value={user.firstName}
                   isInvalid={
                     validations.hasError &&
-                    validations.fieldErrors.firstNameError
+                    !!validations.fieldErrors.firstNameError
                   }
                   onChange={changePerson}
                 />
                 <Form.Control.Feedback type="invalid">{validations.fieldErrors.firstNameError}</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group as={Col} md={12} controlId="middleName">
+              <Form.Group as={Col} md={12}>
                 <Form.Label>Middle Name</Form.Label>
                 <Form.Control
                   id="middleName"
                   name="middleName"
+                  data-testid="middleName"
                   type="text"
                   placeholder="Enter middle name"
                   value={user.middleName}
                   onChange={changePerson}
                 />
               </Form.Group>
-              <Form.Group as={Col} md={12} controlId="lastName">
+              <Form.Group as={Col} md={12}>
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
                   id="lastName"
                   name="lastName"
+                  data-testid="lastName"
                   type="text"
                   placeholder="Enter last name"
                   value={user.lastName}
@@ -152,18 +151,19 @@ useEffect(() => {
                 <Form.Control.Feedback type="invalid">{validations.fieldErrors.lastNameError}</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={12} controlId="formEmail">
+              <Form.Group as={Col} md={12}>
                 <Form.Label>Email address</Form.Label>
                 <Form.Control
                   id="email"
                   name="email"
                   type="email"
+                  data-testid="email"
                   placeholder="Enter email"
                   value={user.email}
                   autoComplete="email"
                   onChange={changePerson}
                   isInvalid={
-                    validations.hasError && validations.fieldErrors.emailError
+                    validations.hasError && !!validations.fieldErrors.emailError
                   }
                 />
                 <Form.Text className="text-muted">
@@ -174,11 +174,12 @@ useEffect(() => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={12} controlId="formProfileName">
+              <Form.Group as={Col} md={12}>
                 <Form.Label>Profile Name</Form.Label>
                 <Form.Control
                   id="profileName"
                   name="profileName"
+                  data-testid="profileName"
                   type="text"
                   placeholder="Enter a name you would like to chose for your profile"
                   value={user.profileName}
@@ -186,7 +187,7 @@ useEffect(() => {
                   autoComplete="nickname"
                   isInvalid={
                     validations.hasError &&
-                    validations.fieldErrors.profileNameError
+                    !!validations.fieldErrors.profileNameError
                   }
                 />
                 <Form.Control.Feedback type="invalid">
@@ -194,11 +195,12 @@ useEffect(() => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={12} controlId="formPassword">
+              <Form.Group as={Col} md={12}>
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   id="password"
                   name="password"
+                  data-testid="password"
                   type="password"
                   placeholder="Password"
                   autoComplete="new-password"
@@ -206,7 +208,7 @@ useEffect(() => {
                   onChange={changePerson}
                   isInvalid={
                     validations.hasError &&
-                    validations.fieldErrors.passwordError
+                    !!validations.fieldErrors.passwordError
                   }
                 />
                 <Form.Control.Feedback type="invalid">
@@ -214,11 +216,12 @@ useEffect(() => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={12} controlId="formDOB">
+              <Form.Group as={Col} md={12}>
                 <Form.Label>Date of Birth</Form.Label>
                 <Form.Control
                   id="dob"
                   name="dob"
+                  data-testid="dob"
                   type="date"
                   value={
                     user.dob
@@ -227,7 +230,7 @@ useEffect(() => {
                   }
                   onChange={changePerson}
                   isInvalid={
-                    validations.hasError && validations.fieldErrors.DOBError
+                    validations.hasError && !!validations.fieldErrors.DOBError
                   }
                 />
                 <Form.Control.Feedback type="invalid">
@@ -235,11 +238,12 @@ useEffect(() => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md={12} controlId="formUserSummary">
+              <Form.Group as={Col} md={12}>
                 <Form.Label>Something about yourself</Form.Label>
                 <Form.Control
                   id="userSummary"
                   name="userSummary"
+                  data-testid="userSummary"
                   as="textarea"
                   rows={3}
                   value={user.userSummary}
@@ -248,7 +252,7 @@ useEffect(() => {
               </Form.Group>
 
               <Form.Group as={Col} md={12}>
-                <Button className="my-3" type="submit">
+                <Button className="my-3" type="submit" data-testid="submit">
                   Submit
                 </Button>
               </Form.Group>

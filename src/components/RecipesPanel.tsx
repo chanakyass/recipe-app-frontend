@@ -1,16 +1,17 @@
 import { useCallback, useEffect } from "react";
-import history from "../app-history";
 import { useModalState } from "../customHooks";
 import { getRecipeList } from "../store/recipe";
-import { Recipe, useAppDispatch, useRecipeSelector } from "../store/store.model";
+import store from "../store/setup";
+import { Recipe, selectDerivedRecipe, useAppDispatch } from "../store/store.model";
 import CompleteRecipeCardModal from "./CompleteRecipeCardModal";
-import RecipeCard from "./RecipeCard";
 import withLoading from "./LoadingPage";
+import RecipeCard from "./RecipeCard";
+import { useHistory } from "react-router";
 
 const RecipesPanel = () => {
-    const recipeIds = useRecipeSelector((state) => {
-       return Object.keys(state.recipes.resourceMap).map((key) => parseInt(key)) || [];
-    });
+    const history = useHistory();
+    const selectRecipeIds = selectDerivedRecipe((recipes) => Object.keys(recipes.resourceMap).map((key) => parseInt(key)));
+    const recipeIds = selectRecipeIds(store.getState());
     const dispatch = useAppDispatch();
     
     const [modalProps, setModalProps] = useModalState<Recipe>({ showModal: false, resource: null });
@@ -19,13 +20,9 @@ const RecipesPanel = () => {
         dispatch(getRecipeList());
     }, [dispatch]);
 
-
-
-
     const viewRecipe = useCallback((recipe: Recipe) => {
         setModalProps((modalProps) => ({ ...modalProps, showModal: true, resource: recipe }));
     }, [setModalProps])
-
 
     return <>               
                 <>

@@ -37,7 +37,9 @@ export const fetchIngredientsStartingWithName = createAsyncThunk("recipes/fetchI
         return ingredientList;
     }
     return null;
-});export const getRecipeList = createAsyncThunk("recipes/getRecipes", async (_, { dispatch }) => {
+});
+
+export const getRecipeList = createAsyncThunk("recipes/getRecipes", async (_, { dispatch }) => {
     dispatch(setRecipeLoading(true));
     const { response: recipeList, error } = await recipeApi.getRecipes() as ResponseObject<Recipe[]>;
     let notification: Partial<Notification> = { resourceType: 'recipe', action: 'READ' };

@@ -1,11 +1,12 @@
-import history from "../app-history";
 import { Col, Form, Button } from 'react-bootstrap';
 import { useEffect, useState } from "react";
-import { withRouter } from "react-router-dom";
+import { useHistory, withRouter } from "react-router-dom";
 import { ThunkResponse, useAppDispatch, useErrorSelector } from "../store/store.model";
 import { loginUser } from "../store/user";
 
 const Login = () => {
+
+    const history = useHistory();
 
     const dispatch = useAppDispatch();
 
@@ -67,6 +68,7 @@ const Login = () => {
                   <Form.Label>Username</Form.Label>
                   <Form.Control
                     id="username"
+                    data-testid="username"
                     name="username"
                     type="email"
                     placeholder="Enter the email id you logged in with"
@@ -80,6 +82,7 @@ const Login = () => {
                   <Form.Label>Password</Form.Label>
                   <Form.Control
                     id="password"
+                    data-testid="password"
                     name="password"
                     type="password"
                     placeholder="Password"
@@ -90,7 +93,7 @@ const Login = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} md={12}>
-                  <Button className="my-3" type="submit">
+                  <Button className="my-3" type="submit" data-testid="submit">
                     Submit
                   </Button>
                 </Form.Group>

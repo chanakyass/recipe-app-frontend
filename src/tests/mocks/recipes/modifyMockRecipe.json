@@ -1,0 +1,71 @@
+{
+    "id": 14909,
+    "name": "Chicken soup",
+    "description": "Chineese chicken soup. Using Vinegar and soya sauce.",
+    "createdOn": "2023-10-02T12:46:22.526",
+    "itemType": "NON_VEG",
+    "serving": 1,
+    "recipeImageAddress": "https://firebasestorage.googleapis.com/v0/b/recipeapp-317810.appspot.com/o/images%2F8202%2Fc79b8a55-2449-4812-9552-2966d5985836-image.jpg?alt=media&token=17c75456-38fa-40e7-a7fd-ce9be07f5661",
+    "cookingInstructions": "Boil water. Add all ingrediants. Mix and serve.",
+    "recipeIngredients": [
+        {
+            "id": 24610,
+            "ingredient": {
+                "id": 11353,
+                "name": "CHICKEN"
+            },
+            "quantity": 100,
+            "uom": "GRAMS"
+        },
+        {
+            "id": 24611,
+            "ingredient": {
+                "id": 22852,
+                "name": "GARLIC"
+            },
+            "quantity": 50,
+            "uom": "GRAMS"
+        },
+        {
+            "id": 24612,
+            "ingredient": {
+                "id": 1,
+                "name": "WATER",
+                "description": "liquid used for providing consistency"
+            },
+            "quantity": 500,
+            "uom": "MILLILITRES"
+        },
+        {
+            "id": 24613,
+            "ingredient": {
+                "id": 1552,
+                "name": "SALT"
+            },
+            "quantity": 1,
+            "uom": "TEA_SPOON"
+        },
+        {
+            "id": 24614,
+            "ingredient": {
+                "id": 22853,
+                "name": "CORIANDER LEAVES"
+            },
+            "quantity": 5,
+            "uom": "NUMBER"
+        },
+        {
+            "ingredient": {
+                "id": 3152,
+                "name": "VINEGAR"
+            },
+            "quantity": 2,
+            "uom": "TEA_SPOON"
+        }
+    ],
+    "user": {
+        "id": 8202,
+        "profileName": "Coding Bro",
+        "email": "coding_bro@rest.com"
+    }
+}

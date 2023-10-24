@@ -4,8 +4,7 @@ import {
   useState,
 } from "react";
 import { Button, Col, Form, InputGroup } from "react-bootstrap";
-import { useParams } from "react-router-dom";
-import history from "../app-history";
+import { useHistory, useParams } from "react-router-dom";
 import { APICallError, ThunkResponse, User, useAppDispatch, useErrorSelector, useUserSelector } from "../store/store.model";
 import { getUser, modifyUser as modifyUserService } from "../store/user";
 import { userApi } from "../services";
@@ -42,6 +41,8 @@ const defaultValidations = {
 };
 
 const UserViewModify = () => {
+
+  const history = useHistory();
 
   const dispatch = useAppDispatch();
 
@@ -115,8 +116,7 @@ const UserViewModify = () => {
           history.push('/');
         }
       });
-    }
-    else {
+    } else {
       setValidations({
         ...defaultValidations,
         hasError: true,
@@ -172,6 +172,7 @@ const UserViewModify = () => {
                   <div className="container">
                     <div className="row my-2">
                       <button
+                        data-testid="set-modify-user"
                         className="mx-auto link-button"
                         onClick={(e) => setModifyUser(true)}
                       >Modify</button>
@@ -186,12 +187,13 @@ const UserViewModify = () => {
                     <h5>User details</h5>
                   </div>
 
-                  <Form.Group as={Col} md={12} controlId="formName">
+                  <Form.Group as={Col} md={12}>
                     {/* <Form.Label>Name</Form.Label> */}
                     <InputGroup>
                       <Form.Control
                         id="firstName"
                         name="firstName"
+                        data-testid="firstName"
                         type="text"
                         placeholder="Enter your first name"
                         value={user.firstName}
@@ -209,6 +211,7 @@ const UserViewModify = () => {
                         <Form.Control
                           id="middleName"
                           name="middleName"
+                          data-testid="middleName"
                           type="text"
                           placeholder="Enter middle name"
                           value={user.middleName}
@@ -226,6 +229,7 @@ const UserViewModify = () => {
                         <Form.Control
                           id="lastName"
                           name="lastName"
+                          data-testid="lastName"
                           type="text"
                           placeholder="Enter last name"
                           value={user.lastName}
@@ -242,13 +246,14 @@ const UserViewModify = () => {
                     </InputGroup>
                   </Form.Group>
 
-                  <Form.Group as={Col} md={12} controlId="formEmail">
+                  <Form.Group as={Col} md={12}>
                     <Form.Label className="h5">Email address:</Form.Label>
 
                     <Form.Control
                       id="email"
                       name="email"
                       type="email"
+                      data-testid="email"
                       placeholder="Enter email"
                       value={user.email}
                       onChange={changePerson}
@@ -265,12 +270,13 @@ const UserViewModify = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
 
-                  <Form.Group as={Col} md={12} controlId="formProfileName">
+                  <Form.Group as={Col} md={12}>
                     <Form.Label>Profile Name</Form.Label>
 
                     <Form.Control
                       id="profileName"
                       name="profileName"
+                      data-testid="profileName"
                       type="text"
                       placeholder="Enter a name you would like to chose for your profile"
                       value={user.profileName}
@@ -286,12 +292,13 @@ const UserViewModify = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
 
-                  <Form.Group as={Col} md={12} controlId="formDOB">
+                  <Form.Group as={Col} md={12}>
                     <Form.Label>Date of Birth</Form.Label>
 
                     <Form.Control
                       id="dob"
                       name="dob"
+                      data-testid="dob"
                       type="date"
                       value={
                         user.dob
@@ -310,12 +317,13 @@ const UserViewModify = () => {
                     </Form.Control.Feedback>
                   </Form.Group>
 
-                  <Form.Group as={Col} md={12} controlId="formUserSummary">
+                  <Form.Group as={Col} md={12}>
                     <Form.Label>Something about yourself</Form.Label>
 
                     <Form.Control
                       id="userSummary"
                       name="userSummary"
+                      data-testid="userSummary"
                       as="textarea"
                       rows={3}
                       value={user.userSummary}
@@ -326,6 +334,7 @@ const UserViewModify = () => {
                   <Form.Group as={Col} md={12}>
                     <Button
                       className="my-3 mr-2"
+                      data-testid="submit"
                       variant="secondary"
                       type="submit"
                     >

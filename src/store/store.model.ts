@@ -1,6 +1,7 @@
 
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import store from "./setup";
+import store, { RootState } from "./setup";
+import { createSelector } from "@reduxjs/toolkit";
 
 export interface UserProxy {
     id: number;
@@ -84,7 +85,6 @@ export interface ResourceState<T> {
 export interface NotificationState {
     errors: Notification[];
     notifications: Notification[];
-    errorInView: boolean;
     currentNotificationMessage: string;
     triggerNotification: boolean;
 }
@@ -109,6 +109,12 @@ export const useRecipeSelector: TypedUseSelectorHook<{ recipes: ResourceState<Re
 export const useErrorSelector: TypedUseSelectorHook<{ notifications: NotificationState }> = useSelector;
 
 export const useUserSelector: TypedUseSelectorHook<{ users: UserState }> = useSelector;
+
+export const selectRecipes = (state: RootState) => state.recipes;
+
+type Selector<S> = (arg: ReturnType<typeof selectRecipes>) => S;
+
+export const selectDerivedRecipe = <T>(fn: Selector<T>) => createSelector([selectRecipes], fn);
 
 export enum ThunkResponse {
     SUCCESS, FAILURE

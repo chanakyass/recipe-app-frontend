@@ -1,0 +1,53 @@
+{
+    "name": "Kadai Paneer ",
+    "description": "The description is small",
+    "createdOn": "2023-10-11T17:25:49.600Z",
+    "itemType": "VEG",
+    "serving": "4",
+    "recipeImageAddress": "https://firebasestorage.googleapis.com/v0/b/recipeapp-317810.appspot.com/o/images%2F8152%2F5d03f0a5-351f-4695-af53-849bec6b2fde-image.jpg?alt=media&token=e2f57100-4aec-442b-a1ff-2700dde3f3c9",
+    "cookingInstructions": "Mix and serve",
+    "recipeIngredients": [
+        {
+            "ingredient": {
+                "id": 1553,
+                "name": "Paneer"
+            },
+            "uuid": "9036495a-de54-442f-b9ca-fc4c4c197182",
+            "quantity": 250,
+            "uom": "GRAMS"
+        },
+        {
+            "ingredient": {
+                "id": 14552,
+                "name": "Onion"
+            },
+            "uuid": "4ebbc2cb-593e-42ba-ab05-1a52a320cefe",
+            "quantity": 2,
+            "uom": "NUMBER"
+        },
+        {
+            "ingredient": {
+                "id": 1,
+                "name": "Water",
+                "description": "liquid used for providing consistency"
+            },
+            "uuid": "8ec14991-2e73-4f91-b008-aa56438255bd",
+            "quantity": 100,
+            "uom": "MILLILITRES"
+        },
+        {
+            "ingredient": {
+                "id": 1554,
+                "name": "Cloves"
+            },
+            "uuid": "14b82425-f0cf-4325-a068-e928e7db5eec",
+            "quantity": 5,
+            "uom": "NUMBER"
+        }
+    ],
+    "user": {
+        "id": 8152,
+        "email": "temp123@rest.com",
+        "profileName": "temp12345"
+    }
+}

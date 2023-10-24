@@ -7,7 +7,6 @@ const notificationSlice = createSlice<NotificationState, SliceCaseReducers<Notif
     initialState: {
       errors: [],
       notifications: [],
-      errorInView: false,
       currentNotificationMessage: '',
       triggerNotification: false,
     },
@@ -15,7 +14,6 @@ const notificationSlice = createSlice<NotificationState, SliceCaseReducers<Notif
         errorAdded(state, action) {
             const { payload: notification } = action;
             state.errors = [...state.errors, { ...notification, id: uuid4() }];
-            state.errorInView = true;
         },
         notificationAdded(state, action) {
             const { payload: notification } = action;
