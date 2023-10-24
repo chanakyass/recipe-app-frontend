@@ -2,9 +2,8 @@ import {
     useState,
   } from "react";
 import { Button, Col, Form, InputGroup } from "react-bootstrap";
-import {  User } from "../store/store.model";
+import {  User, defaultUser } from "../store/store.model";
 import { useHistory } from "react-router";
-import { defaultUser } from "../store/store.model";
 
 type submitHandlerType = (e: any, user: User) => void;
 
@@ -172,7 +171,7 @@ const UserForm = ({ submitHandler, validations, userFormType, userToLoad }: User
                 type="date"
                 value={
                 user.dob
-                    ? new Date(user.dob).toISOString().substr(0, 10)
+                    ? new Date(user.dob).toISOString().slice(0, 10)
                     : ""
                 }
                 onChange={changePerson}

@@ -2,18 +2,13 @@
 import { renderWithProviders } from '../test-utils';
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import * as cookieUtil from 'react-cookies';
 import { Route, Router } from 'react-router';
 import * as routerComps from 'react-router-dom';
 import history from '../../app-history';
 import Register from '../../components/Register';
-import * as services from '../../services';
-import { Recipe } from '../../services';
 import { ThunkResponse } from '../../store/store.model';
 import * as userActions from '../../store/user/userActions';
-import mockGetRecipes from '../mocks/recipes/mockGetRecipesRes.json';
 import { preloadedState } from '../mocks/store/store.mocks';
-import mockUserRes from '../mocks/users/mockUserRes.json';
 
 const storeMock = jest.requireActual('../../store/setup');
 const mockedHistory = {
