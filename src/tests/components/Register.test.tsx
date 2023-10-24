@@ -27,9 +27,6 @@ jest.mock('react-router-dom', () => ({
 }));
 
 beforeEach(() => {
-  jest.spyOn(cookieUtil, 'load').mockImplementation(() => '123');
-  jest.spyOn(services.userApi, 'getUser').mockResolvedValue({ response: mockUserRes, error: null });
-  jest.spyOn(services.recipeApi, 'getRecipes').mockResolvedValue({ response: mockGetRecipes as Recipe[], error: null });
   jest.spyOn(storeMock.default, 'getState').mockReturnValue(preloadedState);
   jest.spyOn(routerComps, 'useHistory').mockReturnValue(mockedHistory as any);
 });

@@ -3,42 +3,12 @@ import { renderWithProviders } from '../test-utils';
 
 import { screen } from '@testing-library/react';
 import * as cookieUtil from 'react-cookies';
-import { v4 } from 'uuid';
 import App from '../../App';
 import * as services from '../../services';
 import { Recipe } from '../../services';
-import { ResourceState } from '../../store/store.model';
 import mockGetRecipes from '../mocks/recipes/mockGetRecipesRes.json';
 import mockUserRes from '../mocks/users/mockUserRes.json';
-
-const map = new Map(mockGetRecipes.map((recipe) => [recipe.id, { ...recipe, recipeIngredients: recipe.recipeIngredients.map((ri) => ({
-  ...ri,
-  uuid: v4(),
-})) }]));
-
-const recipesState = {
-  resourceMap: Object.fromEntries(map),
-  loading: false,
-} as ResourceState<Recipe>;
-
-const userState = {
-  loggedInUser: mockUserRes,
-  loading: false,
-};
-
-const notificationState = {
-  errors: [],
-  notifications: [],
-  currentNotificationMessage: '',
-  triggerNotification: false,
-};
-
-
-const preloadedState = {
-  recipes: recipesState,
-  users: userState,
-  notifications: notificationState,
-}
+import { preloadedState } from '../mocks/store/store.mocks';
 
 const storeMock = jest.requireActual('../../store/setup');
 

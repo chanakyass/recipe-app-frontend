@@ -119,3 +119,15 @@ export const selectDerivedRecipe = <T>(fn: Selector<T>) => createSelector([selec
 export enum ThunkResponse {
     SUCCESS, FAILURE
 };
+
+export const defaultUser = {
+    id: undefined,
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    profileName: "",
+    dob: "",
+    userSummary: "",
+} as User;
