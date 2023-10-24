@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
     "outDir": "build/dist",
-    "module": "commonjs",
+    "module": "esnext",
     "target": "es2019",
-    "lib": ["es2019", "dom"],
+    "lib": [
+      "es2019",
+      "dom"
+    ],
     "sourceMap": true,
     "allowJs": true,
     "jsx": "react-jsx",
@@ -14,7 +17,14 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "noEmit": true
   },
   "exclude": [
     "node_modules",
@@ -29,6 +39,11 @@
     "typePatches"
   ],
   "paths": {
-      "react": [ "./node_modules/@types/react" ]
-  }
+    "react": [
+      "./node_modules/@types/react"
+    ]
+  },
+  "include": [
+    "src"
+  ]
 }
