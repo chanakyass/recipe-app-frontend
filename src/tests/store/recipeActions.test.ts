@@ -1,11 +1,10 @@
-import * as recipeActions from "../../store/recipe/recipeActions";
-import { preloadedState } from "../mocks/store/store.mocks";
-import mockAddRecipe from '../mocks/recipes/mockAddRecipeReq.json'
-import mockModifyRecipe from '../mocks/recipes/modifyMockRecipe.json'
-import { Recipe, ThunkResponse } from "../../store/store.model";
 import * as recipeApi from "../../services/recipe-services";
-import * as recipeSlice from '../../store/recipe/recipeSlice';
 import * as notificationActions from '../../store/notification/notificationActions';
+import * as recipeActions from "../../store/recipe/recipeActions";
+import * as recipeSlice from '../../store/recipe/recipeSlice';
+import { ThunkResponse } from "../../store/store.model";
+import mockAddRecipe from '../mocks/recipes/mockAddRecipeReq.json';
+import mockModifyRecipe from '../mocks/recipes/modifyMockRecipe.json';
 
 describe('test Recipe actions', () => {
 
