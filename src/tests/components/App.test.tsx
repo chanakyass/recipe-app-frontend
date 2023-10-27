@@ -1,7 +1,7 @@
 // We're using our own custom render function and not RTL's render.
 import { renderWithProviders } from '../test-utils';
 
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import * as cookieUtil from 'react-cookies';
 import App from '../../App';
 import * as services from '../../services';
@@ -9,6 +9,7 @@ import { Recipe } from '../../services';
 import mockGetRecipes from '../mocks/recipes/mockGetRecipesRes.json';
 import mockUserRes from '../mocks/users/mockUserRes.json';
 import { preloadedState } from '../mocks/store/store.mocks';
+import history from "../../app-history";
 
 const storeMock = jest.requireActual('../../store/setup');
 
@@ -25,6 +26,22 @@ test('renders all recipes on overview screen', async () => {
   const elements = await screen.findAllByTestId('recipe-card', { exact: false });
   expect(elements.length).toBe(mockGetRecipes.length);
   expect(jestStore.dispatch).toHaveBeenCalled();
+  unmount();
+});
+
+test('renders error page when cookie is not available', async () => {
+  const { unmount } = renderWithProviders(<App/>, { preloadedState });
+  history.push('/error', {
+    statusCode: 500,
+    message: "Internal Server error",
+    details: ["Error in processing"],
+  });
+  const element = await screen.findByTestId('errorStatus');
+  expect(element.innerHTML).toContain('HTTP ERROR 500');
+  
+  const element2 = await screen.findByTestId('errorMessage');
+  expect(element2.innerHTML).toContain('Internal Server error');
+
   unmount();
 });
 

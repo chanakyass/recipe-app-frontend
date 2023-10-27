@@ -9,17 +9,13 @@ const ErrorPage = ({ location }: any) => {
   };
 
   const error = location.state || defaultError;
-  console.log(error);
-  console.log(error.statusCode);
-  console.log(error.details);
-  console.log(error.message);
   return (
     <>
       <div className="mw-100">
         <div className="m-3 border-bottom row">
-          <h2>HTTP ERROR {error.statusCode}</h2>
+          <h2 data-testid='errorStatus'>HTTP ERROR {error.statusCode}</h2>
         </div>
-        <div className="m-4 row">
+        <div className="m-4 row" data-testid='errorMessage'>
           <span>{error.message}</span>
         </div>
         {error.details && (

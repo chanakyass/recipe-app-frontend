@@ -1,0 +1,7 @@
+{
+    "statusCode": 500,
+    "URI": "xyz",
+    "message": "There was an error",
+    "timestamp": "Today",
+    "details": ["500 Error"]
+}

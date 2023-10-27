@@ -1,62 +1,27 @@
 import { baseURI } from "../util/api-config";
 import * as cookie from 'react-cookies';
-import { APICallError, ApiMessageResponse, AuthRequest, ResponseObject, User, UserProxy } from "./service.model";
+import { ApiMessageResponse, AuthRequest, ResponseObject, User, UserProxy } from "./service.model";
+import { callEndpointAndHandleResult } from "./utils";
 
 export const loginUser = async (creds: AuthRequest): Promise<ResponseObject<UserProxy>> => {
+  const body = JSON.stringify({ ...creds });
+  const responseObj = await callEndpointAndHandleResult<ResponseObject<UserProxy>>(`${baseURI}/public/login`, 'POST', body, true, true);
+  if (!responseObj.error) {
+    const jwt = responseObj.token as string;
+    let expires = new Date();
+    expires.setDate(expires.getDate() + 7);
 
-    const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...creds }),
-  };
-  try {
-
-    const response = await fetch(`${baseURI}/public/login`, requestOptions);
-    if (response.status === 200) {
-      const currentUser = await response.json();
-      const jwt = response.headers.get("Authorization") as string;
-
-      let expires = new Date();
-      expires.setDate(expires.getDate() + 7);
-
-      cookie.save("jwt", jwt, { path: "/", expires: expires });
-      cookie.save("current_user", currentUser, {
-        path: "/",
-        expires: expires,
-      });
-      return { response: currentUser, error: null };
-    }
-    else {
-      const apiCallError = await response.json();
-      return { response: null, error: apiCallError };
-    }
-  } catch (error) {
-    return { response: null, error: error as APICallError };
+    cookie.save("jwt", jwt, { path: "/", expires: expires });
+    cookie.save("current_user", responseObj.response!, {
+      path: "/",
+      expires: expires,
+    }); 
   }
-
+  return { response: responseObj.response, error: responseObj.error };
 }
 
 export const registerUser = async (user: User): Promise<ResponseObject<User>> => {
-    const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...user })
-  };
-  try {
-
-    const response = await fetch(`${baseURI}/public/register`, requestOptions);
-    if (response.status === 200) {
-      const currentUser = await response.json();
-      return { response: currentUser, error: null };
-    }
-    else {
-      const apiCallError = await response.json();
-      return { response: null, error: apiCallError };
-    }
-  }
-  catch (error) {
-    return { response: null, error: error as APICallError };
-  }
+  return callEndpointAndHandleResult(`${baseURI}/public/register`, 'POST', JSON.stringify({ ...user }), true);
 }
 
 export const isValid = (user: User, fieldErrors: { [key: string]: string }, method: string): boolean => {
@@ -115,76 +80,30 @@ export const isValid = (user: User, fieldErrors: { [key: string]: string }, meth
 };
 
 export const getUser = async (id: number): Promise<ResponseObject<User>> => {
-
-  const jwtToken = cookie.load("jwt");
-  
-  const requestOptions = {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-          "Content-Type": "application/json",
-        },
-      };
-
-  try {
-    const response = await fetch(`${baseURI}/user/${id}`, requestOptions);
-    if (response.status === 200) {
-      const user = await response.json();
-      return { response: user, error: null };
-    }
-    else {
-      const apiCallError = await response.json();
-      return { response: null, error: apiCallError };
-    }
-  } catch (error) {
-    return { response: null, error: error as APICallError };
-  }
+  return callEndpointAndHandleResult(`${baseURI}/user/${id}`, 'GET'); 
 }
 
 export const updateUser = async (user: User): Promise<ResponseObject<ApiMessageResponse>> => {
-  const jwtToken = cookie.load('jwt');
   const loggedInUser = cookie.load("current_user");
+  const responseObj = await callEndpointAndHandleResult<ResponseObject<ApiMessageResponse>>(`${baseURI}/user`, 'PUT', JSON.stringify({ ...user }));
+  if (!responseObj.error) {
+    const currentUser = {
+      ...loggedInUser,
+      firstName: user.firstName,
+      middleName: user.middleName,
+      lastName: user.lastName,
+      userSummary: user.userSummary,
+      profileName: user.profileName,
+      dob: user.dob
+    };
 
-  const requestOptions = {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${jwtToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ...user }),
-  };
-  try {
-    const response = await fetch(`${baseURI}/user`, requestOptions);
+    let expires = new Date();
+    expires.setDate(expires.getDate() + 7);
 
-    if (response.status === 200) {
-      const apiMessageResponse = await response.json();
-      const currentUser = {
-        ...loggedInUser,
-        firstName: user.firstName,
-        middleName: user.middleName,
-        lastName: user.lastName,
-        userSummary: user.userSummary,
-        profileName: user.profileName,
-        dob: user.dob
-      };
-
-      let expires = new Date();
-      expires.setDate(expires.getDate() + 7);
-
-      cookie.save("current_user", currentUser, {
-        path: "/",
-        expires: expires,
-      });
-      return { response: apiMessageResponse, error: null };
-
-    }
-
-    else {
-      const apiCallError = await response.json();
-      return { response: null, error: apiCallError };
-    }
-
-  } catch (error) {
-    return { response: null, error: error as APICallError};
+    cookie.save("current_user", currentUser, {
+      path: "/",
+      expires: expires,
+    });
   }
+  return responseObj;
 }

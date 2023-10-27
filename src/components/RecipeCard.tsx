@@ -14,6 +14,7 @@ const RecipeCard = ({ recipeId, viewRecipe }: { recipeId: number, viewRecipe: (r
     const recipe = useRecipeSelector((state) => state.recipes.resourceMap[recipeId]);
 
     return <>
+    { recipe &&
         <div className="col-md-3 col-lg-3 col-sm-3 m-4 rounded shadow grow" style={{ cursor: "pointer" }} onClick={ () => viewRecipe(recipe) } data-testid={`recipe-card-${recipe.id}`}>
             <Card className="border-0">
                 <Card.Img variant="top" src={recipe.recipeImageAddress}/>
@@ -53,9 +54,8 @@ const RecipeCard = ({ recipeId, viewRecipe }: { recipeId: number, viewRecipe: (r
                 </div>
             </Card>
         </div>
-        </>
-
-    
+    }
+    </>
 }
 
 export default RecipeCard;

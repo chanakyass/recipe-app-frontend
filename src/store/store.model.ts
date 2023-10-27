@@ -40,6 +40,10 @@ export interface RecipeIngredient {
     uuid?: string;
 }
 
+interface ExtendedFile extends File {
+    lastModifiedDate: Date | string;
+};
+
 export interface Recipe {
     id?: number;
     name: string;
@@ -51,7 +55,7 @@ export interface Recipe {
     cookingInstructions: string;
     recipeIngredients: RecipeIngredient[];
     user: UserProxy;
-    image?: File;
+    image?: ExtendedFile;
 }
 
 export interface Resource {
