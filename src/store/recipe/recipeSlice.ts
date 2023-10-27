@@ -44,6 +44,6 @@ const recipeSlice = createSlice<ResourceState<Recipe>, SliceCaseReducers<Resourc
     },
 });
 
-export const { recipeAdded, recipeListAdded, recipeModified, recipeDeleted, appendError, removeError, setRecipeLoading } = recipeSlice.actions;
+export const { recipeAdded, recipeListAdded, recipeModified, recipeDeleted, setRecipeLoading } = recipeSlice.actions;
 
  export default recipeSlice.reducer;

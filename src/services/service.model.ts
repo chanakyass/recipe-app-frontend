@@ -1,6 +1,7 @@
 export interface ResponseObject<T> {
     response: T | null;
     error: APICallError | null;
+    token?: string;
 }
 
 export interface APICallError {

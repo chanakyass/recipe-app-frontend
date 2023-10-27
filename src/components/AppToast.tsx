@@ -18,7 +18,7 @@ const AppToast = () => {
         }
     }, [dispatch, notifications])
 
-    return <div className="d-flex justify-content-center w-100 z2">
+    return <div className="d-flex justify-content-center w-100 z2"  data-testid='toastMessage'>
         {   toastMessage &&
             <Toast className="toast-rewrite rounded" delay={2500}>
                 <Toast.Header>

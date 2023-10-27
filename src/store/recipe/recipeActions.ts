@@ -12,7 +12,8 @@ export const modifyRecipe = createAsyncThunk("recipes/modifyRecipe", async (reci
         dispatch(handleError({ error, ...notification }));
         return ThunkResponse.FAILURE;
     } else {
-        dispatch(recipeModified(recipe));
+        const { image, ...recipeWithoutImage } = recipe;
+        dispatch(recipeModified(recipeWithoutImage));
         dispatch(handleNotification({ ...notification, resourceId: response?.generatedId, message: response?.message } as Notification));
         return ThunkResponse.SUCCESS;
     }
@@ -62,7 +63,8 @@ export const addRecipe = createAsyncThunk("recipes/addRecipe", async (recipe: Re
             ...recipe,
             id: response?.generatedId
         };
-        dispatch(recipeAdded(generatedRecipe));
+        const { image: _, ...recipeWithoutImage } = generatedRecipe;
+        dispatch(recipeAdded(recipeWithoutImage));
         dispatch(handleNotification({ resourceId: response?.generatedId, ...notification, message: response?.message }));
         return ThunkResponse.SUCCESS;
     }

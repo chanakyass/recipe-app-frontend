@@ -1,14 +1,15 @@
 // We're using our own custom render function and not RTL's render.
 import { renderWithProviders } from '../test-utils';
 
-import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import * as routerComps from 'react-router-dom';
 import * as routerDom from 'react-router-dom';
 import AddModifyRecipe from '../../components/AddModifyRecipe';
 import * as recipeActions from '../../store/recipe/recipeActions';
+import { setupConfiguredStore } from '../../store/setup';
 import { ThunkResponse } from '../../store/store.model';
 import { preloadedState } from '../mocks/store/store.mocks';
-import * as routerComps from 'react-router-dom';
-import { setupConfiguredStore } from '../../store/setup';
+import * as utilities from '../../util/utility-functions';
 
 const storeMock = jest.requireActual('../../store/setup');
 
@@ -28,6 +29,7 @@ jest.mock('react-router-dom', () => {
 beforeEach(() => {
   jest.spyOn(storeMock.default, 'getState').mockReturnValue(preloadedState);
   jest.spyOn(routerComps, 'useHistory').mockReturnValue(mockedHistory as any);
+  jest.spyOn(utilities, 'debounced').mockImplementation((arg1, _arg2, ...arg3) => arg1(arg3));
 });
 
 test('Test add recipe', async () => {
@@ -135,6 +137,7 @@ test('Test add recipe', async () => {
 });
 
 test('Test modify recipe', async () => {
+    jest.useFakeTimers();
     const fn1 = jest.fn().mockReturnValue('fetchIngredientsStartingWithName');
     const fn2 = jest.fn().mockReturnValue('modifyRecipe');
 
@@ -159,7 +162,7 @@ test('Test modify recipe', async () => {
                 unwrap: jest.fn().mockResolvedValue(ThunkResponse.SUCCESS)
             };
         }
-      });
+    });
   
     const { unmount } = renderWithProviders(<AddModifyRecipe/>, { preloadedState, store: mockStore }, dispatchSpy);
   
