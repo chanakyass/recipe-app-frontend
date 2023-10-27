@@ -1,15 +1,15 @@
 // We're using our own custom render function and not RTL's render.
 import { renderWithProviders } from '../test-utils';
 
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import * as cookieUtil from 'react-cookies';
 import App from '../../App';
+import history from "../../app-history";
 import * as services from '../../services';
 import { Recipe } from '../../services';
 import mockGetRecipes from '../mocks/recipes/mockGetRecipesRes.json';
-import mockUserRes from '../mocks/users/mockUserRes.json';
 import { preloadedState } from '../mocks/store/store.mocks';
-import history from "../../app-history";
+import mockUserRes from '../mocks/users/mockUserRes.json';
 
 const storeMock = jest.requireActual('../../store/setup');
 
